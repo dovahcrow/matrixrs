@@ -51,7 +51,7 @@ impl<T:Clone> Matrix<T> {
 	}
 	pub fn row(&self, row : uint) -> Matrix<T> {
 		// Return row r from an MxN matrix as a 1xN matrix.
-		Matrix{m: 1, n:(*self).n, data: ~[(*self).data[row].to_owned()]}
+		Matrix{m: 1, n:self.n, data: ~[self.data[row].to_owned()]}
 	}
 	pub fn col(&self, col : uint) -> Matrix<T> {
 		// Return col c from an MxN matrix as an Mx1 matrix.
@@ -95,6 +95,14 @@ impl<T:Num+Clone> Matrix<T> {
 		let mut acc : T = Zero::zero();
 		self.apply(|i,j| { acc = acc+self.at(i,j) });
 		acc
+	}
+	pub fn dot(&self, other: &Matrix<T>) -> T {
+		// multiply first row of self by first col of other
+		let mut sum : T = Zero::zero();
+		for i in range(0, self.n) {
+			sum = sum + self.at(0, i) * other.at(i, 0);
+		}
+		sum
 	}
 	// Perform the LU decomposition of the matrix.
 	// Find the determinant of the matrix.
@@ -141,11 +149,14 @@ impl<T:Num+Clone> Sub<Matrix<T>, Matrix<T>> for Matrix<T> {
 }
 
 // use * to multiply matrices
-/*impl<T:Num+Clone> Mul<Matrix<T>, Matrix<T>> for Matrix<T> {
+impl<T:Num+Clone> Mul<Matrix<T>, Matrix<T>> for Matrix<T> {
 	fn mul(&self, rhs: &Matrix<T>) -> Matrix<T> {
-		zeros(3,3)
+		assert!((*self).n == (*rhs).m);
+		Matrix::from_fn((*self).m, (*rhs).n, |i,j| {
+			self.row(i).dot(&rhs.col(j))
+		})
 	}
-}*/
+}
 
 // use [(x,y)] to index matrices
 impl<T:Clone> Index<(uint, uint), T> for Matrix<T> {
