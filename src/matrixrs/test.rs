@@ -49,6 +49,23 @@ fn test_sub() {
 }
 
 #[test]
+fn test_mul() {
+	let m = Matrix{m:3,n:3,data:~[~[8,1,6],~[3,5,7],~[4,9,2]]};
+	let m_sq = Matrix{m:3,n:3,data:~[~[91,67,67],~[67,91,67],~[67,67,91]]};
+	assert!(m*m == m_sq);
+	let m1 = Matrix{m:2, n:2, data: ~[~[1,1],~[2,2]]};
+	let m5 = Matrix{m:2, n:1, data: ~[~[2],~[3]]};
+	let m1m5 = Matrix{m:2,n:1, data: ~[~[5],~[10]]};
+	assert!(m1*m5 == m1m5);
+	let m4_row = Matrix{m:1, n:3, data:~[~[1,2,3]]};
+	let m4_col = Matrix{m:3, n:1, data: ~[~[1],~[2],~[3]]};
+	let m4colrow = Matrix{m:3,n:3,data:~[~[1,2,3],~[2,4,6],~[3,6,9]]};
+	assert!(m4_col*m4_row == m4colrow);
+	let m4rowcol = Matrix{m:1, n:1, data:~[~[14]]};
+	assert!(m4_row*m4_col == m4rowcol);
+}
+
+#[test]
 fn test_not() {
 	let m1 = Matrix{m:2, n:2, data: ~[~[1,1],~[2,2]]};
 	let m1_tpose = Matrix{m:2, n:2, data:~[~[1,2],~[1,2]]};
