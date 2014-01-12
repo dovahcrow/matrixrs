@@ -105,6 +105,20 @@ impl<T:Num+Clone> Matrix<T> {
 	}
 }
 
+impl<T:ToStr+Clone> ToStr for Matrix<T> {
+	fn to_str(&self) -> ~str {
+		//! Return a string representation of Matrix self.
+		let mut repr = ~"";
+		for i in range(0, self.m) {
+			for j in range(0, self.n) {
+				repr.push_str(format!("{:>6s}", self.at(i,j).to_str()));
+			}
+			repr.push_char(if (i + 1) == self.n { ' ' } else { '\n' });
+		}
+		repr
+	}
+}
+
 impl<T:Eq+Clone> Eq for Matrix<T> {
 	fn eq(&self, rhs: &Matrix<T>) -> bool {
 		//! Test equality of two matrices.

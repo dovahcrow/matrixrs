@@ -3,6 +3,13 @@ extern mod matrixrs;
 use matrixrs::Matrix;
 
 #[test]
+fn test_to_str() {
+	let m = Matrix{m:3,n:3,data:~[~[8,1,6],~[3,5,7],~[4,9,2]]};
+	let m_str = m.to_str();
+	println!("{:s}", m_str);
+}
+
+#[test]
 fn test_eq() {
 	// test equality
 	let m1 = Matrix{m:2, n:2, data: ~[~[1,1],~[2,2]]};
