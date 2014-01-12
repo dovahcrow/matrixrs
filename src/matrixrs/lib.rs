@@ -20,34 +20,30 @@ impl<T> Matrix<T> {
 	pub fn from_fn(m : uint, n : uint, func : |uint, uint| -> T) -> Matrix<T> {
 		// Create an MxN matrix by using a function that returns a number given
 		// row and column.
-		let mut i = 0;
 		let mut data = vec::with_capacity(m);
-		while i < m {
+		for i in range(0, m) {
 			data.push(vec::from_fn(n, |j:uint| -> T { func(i, j) }));
-			i += 1;
 		}
 		Matrix{m:m, n:n, data:data}
 	}
 	pub fn size(&self) -> (uint, uint) {
 		// Return the size of a Matrix as row, column.
-		((*self).m, (*self).n)
+		(self.m, self.n)
 	}
 }
 
 impl<T:Clone> Matrix<T> {
 	pub fn from_T(m : uint, n : uint, val : T) -> Matrix<T> {
 		// Create an MxN matrix of val numbers.
-		let mut i = 0;
 		let mut data = vec::with_capacity(m);
-		while i < m {
+		for _ in range(0, m) {
 			data.push(vec::from_elem(n, val.clone()));
-			i += 1;
 		}
 		Matrix{m:m, n:n, data:data}
 	}
 	fn at(&self, row : uint, col : uint) -> T {
 		// Return the element at row, col.
-		(*self).data[row][col].clone()
+		self.data[row][col].clone()
 	}
 	pub fn row(&self, row : uint) -> Matrix<T> {
 		// Return row r from an MxN matrix as a 1xN matrix.
@@ -55,37 +51,31 @@ impl<T:Clone> Matrix<T> {
 	}
 	pub fn col(&self, col : uint) -> Matrix<T> {
 		// Return col c from an MxN matrix as an Mx1 matrix.
-		let mut c = vec::with_capacity((*self).m);
-		let mut i = 0;
-		while i < (*self).m {
+		let mut c = vec::with_capacity(self.m);
+		for i in range(0, self.m) {
 			c.push(~[self.at(i, col)]);
-			i += 1;
 		}
-		Matrix{m: (*self).m, n: 1, data: c}
+		Matrix{m: self.m, n: 1, data: c}
 	}
 	pub fn augment(&self, mat : &Matrix<T>) -> Matrix<T> {
 		// Augment the self matrix MxN with another matrix MxC
-		Matrix::from_fn((*self).m, (*self).n+mat.n, |i,j| {
-			if j < (*self).n { self.at(i, j) } else { mat.at(i, j - (*self).n) }
+		Matrix::from_fn(self.m, self.n+mat.n, |i,j| {
+			if j < self.n { self.at(i, j) } else { mat.at(i, j - self.n) }
 		})
 	}
 	pub fn transpose(&self) -> Matrix<T> {
 		// Return the transpose of the matrix.
-		Matrix::from_fn((*self).n, (*self).m, |i,j| { self.at(j, i) })
+		Matrix::from_fn(self.n, self.m, |i,j| { self.at(j, i) })
 	}
 	pub fn apply(&self, applier : |uint, uint|) {
-		let mut i = 0;
-		while i < (*self).m {
-			let mut j = 0;
-			while j < (*self).n {
+		for i in range(0, self.m) {
+			for j in range(0, self.n) {
 				applier(i, j);
-				j += 1;
 			}
-			i += 1;
 		}
 	}
 	pub fn map(&self, mapper : |T| -> T) -> Matrix<T> {
-		Matrix::from_fn((*self).m, (*self).n, |i,j| { mapper(self.at(i,j)) })
+		Matrix::from_fn(self.m, self.n, |i,j| { mapper(self.at(i,j)) })
 	}
 }
 
@@ -96,7 +86,7 @@ impl<T:Num+Clone> Matrix<T> {
 		self.apply(|i,j| { acc = acc+self.at(i,j) });
 		acc
 	}
-	pub fn dot(&self, other: &Matrix<T>) -> T {
+	fn dot(&self, other: &Matrix<T>) -> T {
 		// multiply first row of self by first col of other
 		let mut sum : T = Zero::zero();
 		for i in range(0, self.n) {
@@ -104,9 +94,6 @@ impl<T:Num+Clone> Matrix<T> {
 		}
 		sum
 	}
-	// Perform the LU decomposition of the matrix.
-	// Find the determinant of the matrix.
-	// Multiply another matrix by this one.
 }
 
 impl<T:Eq+Clone> Eq for Matrix<T> {
@@ -128,7 +115,7 @@ impl<T:Eq+Clone> Eq for Matrix<T> {
 impl<T:Num+Clone> Add<Matrix<T>,Matrix<T>> for Matrix<T> {
 	fn add(&self, rhs: &Matrix<T>) -> Matrix<T> {
 		assert!(self.size() == rhs.size());
-		Matrix::from_fn((*self).m, (*self).n, |i, j| {
+		Matrix::from_fn(self.m, self.n, |i, j| {
 			self.at(i,j) + rhs.at(i,j)
 		})
 	}
@@ -151,8 +138,8 @@ impl<T:Num+Clone> Sub<Matrix<T>, Matrix<T>> for Matrix<T> {
 // use * to multiply matrices
 impl<T:Num+Clone> Mul<Matrix<T>, Matrix<T>> for Matrix<T> {
 	fn mul(&self, rhs: &Matrix<T>) -> Matrix<T> {
-		assert!((*self).n == (*rhs).m);
-		Matrix::from_fn((*self).m, (*rhs).n, |i,j| {
+		assert!(self.n == (*rhs).m);
+		Matrix::from_fn(self.m, (*rhs).n, |i,j| {
 			self.row(i).dot(&rhs.col(j))
 		})
 	}
