@@ -102,11 +102,11 @@ impl<T:Num+Clone> Matrix<T> {
 }
 
 impl<T:Eq+Clone> Eq for Matrix<T> {
-	fn eq(&self, _rhs: &Matrix<T>) -> bool {
-		if self.size() == _rhs.size() {
+	fn eq(&self, rhs: &Matrix<T>) -> bool {
+		if self.size() == rhs.size() {
 			let mut equal = true;
 			self.apply(|i,j| {
-				equal = if self.at(i,j) == _rhs.at(i,j) { equal } else { false };
+				equal = if self.at(i,j) == rhs.at(i,j) { equal } else { false };
 			});
 			equal
 		}
@@ -118,10 +118,10 @@ impl<T:Eq+Clone> Eq for Matrix<T> {
 
 // use + to add matrices
 impl<T:Num+Clone> Add<Matrix<T>,Matrix<T>> for Matrix<T> {
-	fn add(&self, _rhs: &Matrix<T>) -> Matrix<T> {
-		assert!(self.size() == _rhs.size());
+	fn add(&self, rhs: &Matrix<T>) -> Matrix<T> {
+		assert!(self.size() == rhs.size());
 		Matrix::from_fn((*self).m, (*self).n, |i, j| {
-			self.at(i,j) + _rhs.at(i,j)
+			self.at(i,j) + rhs.at(i,j)
 		})
 	}
 }
@@ -135,15 +135,22 @@ impl<T:Num+Clone> Neg<Matrix<T>> for Matrix<T> {
 
 // use binary - to subtract matrices
 impl<T:Num+Clone> Sub<Matrix<T>, Matrix<T>> for Matrix<T> {
-	fn sub(&self, _rhs: &Matrix<T>) -> Matrix<T> {
-		self + (-_rhs)
+	fn sub(&self, rhs: &Matrix<T>) -> Matrix<T> {
+		self + (-rhs)
 	}
 }
 
+// use * to multiply matrices
+/*impl<T:Num+Clone> Mul<Matrix<T>, Matrix<T>> for Matrix<T> {
+	fn mul(&self, rhs: &Matrix<T>) -> Matrix<T> {
+		zeros(3,3)
+	}
+}*/
+
 // use [(x,y)] to index matrices
 impl<T:Clone> Index<(uint, uint), T> for Matrix<T> {
-	fn index(&self, &_rhs: &(uint, uint)) -> T {
-		match _rhs {
+	fn index(&self, &rhs: &(uint, uint)) -> T {
+		match rhs {
 			(x,y) => self.at(x,y)
 		}
 	}
@@ -158,8 +165,8 @@ impl<T:Clone> Not<Matrix<T>> for Matrix<T> {
 
 // use | to augment matrices
 impl<T:Clone> BitOr<Matrix<T>,Matrix<T>> for Matrix<T> {
-	fn bitor(&self, _rhs: &Matrix<T>) -> Matrix<T> {
-		self.augment(_rhs)
+	fn bitor(&self, rhs: &Matrix<T>) -> Matrix<T> {
+		self.augment(rhs)
 	}
 }
 
