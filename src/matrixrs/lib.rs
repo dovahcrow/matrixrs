@@ -119,6 +119,7 @@ impl<T:Eq+Clone> Eq for Matrix<T> {
 // use + to add matrices
 impl<T:Num+Clone> Add<Matrix<T>,Matrix<T>> for Matrix<T> {
 	fn add(&self, _rhs: &Matrix<T>) -> Matrix<T> {
+		assert!(self.size() == _rhs.size());
 		Matrix::from_fn((*self).m, (*self).n, |i, j| {
 			self.at(i,j) + _rhs.at(i,j)
 		})
