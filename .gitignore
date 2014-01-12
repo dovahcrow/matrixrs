@@ -2,3 +2,6 @@
 build
 .rust
 bin
+lib
+doc
+rustpkg_db.json
