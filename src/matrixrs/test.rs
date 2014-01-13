@@ -153,10 +153,10 @@ fn test_row() {
 }
 
 #[test]
-fn test_plu_decomp() {
+fn test_lu() {
 	let m = Matrix{m:4,n:4,data:~[~[7,3,-1,2],~[3,8,1,-4],~[-1,1,4,-1],~[2,-4,-1,6]]};
 	let p_exp = Matrix{m:4,n:4,data:~[~[1,0,0,0],~[0,1,0,0],~[0,0,1,0],~[0,0,0,1]]};
-	match m.plu_decomp() {
+	match m.lu() {
 		(P, L, U) => {
 			assert_eq!(P, p_exp);
 			// m*P should equal L*U, but we'll give a little room for rounding
@@ -164,13 +164,13 @@ fn test_plu_decomp() {
 		}
 	}
 	let m2 = Matrix{m:3,n:3,data:~[~[8,1,6],~[3,5,7],~[4,9,2]]};
-	match m2.plu_decomp() {
+	match m2.lu() {
 		(P, L, U) => {
 			assert!((L*U).approx_eq(&(P*m2), 0.01));
 		}
 	}
 	let m3 = Matrix{m:2,n:2,data:~[~[-4,6],~[-10,3]]};
-	match m3.plu_decomp() {
+	match m3.lu() {
 		(P, L, U) => {
 			assert!((L*U).approx_eq(&(P*m3), 0.01));
 		}
