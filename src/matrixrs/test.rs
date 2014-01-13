@@ -160,7 +160,29 @@ fn test_plu_decomp() {
 		(P, L, U) => {
 			assert_eq!(P, p_exp);
 			// m*P should equal L*U, but we'll give a little room for rounding
-			assert!((L*U).approx_eq(&(m*P), 0.01));
+			assert!((L*U).approx_eq(&(P*m), 0.01));
 		}
 	}
+	let m2 = Matrix{m:3,n:3,data:~[~[8,1,6],~[3,5,7],~[4,9,2]]};
+	match m2.plu_decomp() {
+		(P, L, U) => {
+			assert!((L*U).approx_eq(&(P*m2), 0.01));
+		}
+	}
+	let m3 = Matrix{m:2,n:2,data:~[~[-4,6],~[-10,3]]};
+	match m3.plu_decomp() {
+		(P, L, U) => {
+			assert!((L*U).approx_eq(&(P*m3), 0.01));
+		}
+	}
+}
+
+#[test]
+fn test_det() {
+	let m = Matrix{m:3,n:3,data:~[~[8,1,6],~[3,5,7],~[4,9,2]]};
+	assert_eq!(m.det(), -360.0);
+	let m2 = Matrix{m:1,n:1,data:~[~[100]]};
+	assert_eq!(m2.det(), 100.0);
+	let m3 = Matrix{m:2,n:2,data:~[~[-4,6],~[-10,3]]};
+	assert_eq!(m3.det(), 48.0);
 }

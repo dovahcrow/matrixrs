@@ -84,6 +84,7 @@ impl<T:Clone> Matrix<T> {
 		}
 	}
 }
+
 impl<T:Clone, U> Matrix<T> {
 	pub fn map(&self, mapper : |T| -> U) -> Matrix<U> {
 		//! Return a copy of self where each value has been
@@ -161,14 +162,13 @@ impl<T:Num+NumCast+Clone+Signed+Orderable> Matrix<T> {
 	}
 	pub fn plu_decomp(&self) -> (Matrix<T>, Matrix<f64>, Matrix<f64>) {
 		//! Perform the LU decomposition of square matrix self, and return
-		//! the tuple (P,L,U) where P*self = L*U.
-		assert!(self.m == self.n);
+		//! the tuple (P,L,U) where P*self = L*U, and L and U are triangular.
+		assert_eq!(self.m, self.n);
 		let P = self.doolittle_pivot();
 		let PM = (P*(*self)).to_f64();
-		let mut L = zeros(self.m, self.n);
+		let mut L = identity(self.m);
 		let mut U = zeros(self.m, self.n);
 		for j in range(0, self.n) {
-			L.data[j][j] = 1.0;
 			for i in range(0, j+1) {
 				let mut uppersum = 0.0;
 				for k in range(0,i) {
@@ -185,6 +185,30 @@ impl<T:Num+NumCast+Clone+Signed+Orderable> Matrix<T> {
 			}
 		}
 		(P, L, U)
+	}
+	pub fn det(&self) -> f64 {
+		//! Return the determinant of square matrix self
+		//! via LU decomposition.
+		match self.plu_decomp() {
+			// |L|=1 because it L is unitriangular
+			// |P|=1 or -1 because it's a permutation matrix
+			// |U|=product of U's diagonal
+			(P, _, U) => {
+				// return the product of the diagonal
+				let mut prod = 1.0;
+				let mut swaps = 0;
+				for i in range(0, self.m) {
+					prod *= U.at(i,i);
+					swaps += if P.at(i,i) == One::one() { 0 } else { 1 };
+				}
+				// flip the sign of the determinant based on swaps of P
+				if (swaps/2) % 2 == 1 {
+					-prod
+				} else {
+					prod
+				}
+			}
+		}
 	}
 }
 
@@ -224,7 +248,7 @@ impl<T:Add<T,T>+Clone> Add<Matrix<T>,Matrix<T>> for Matrix<T> {
 	fn add(&self, rhs: &Matrix<T>) -> Matrix<T> {
 		//! Return the sum of two matrices with the same dimensions.
 		//! If sizes don't match, fail.
-		assert!(self.size() == rhs.size());
+		assert_eq!(self.size(), rhs.size());
 		Matrix::from_fn(self.m, self.n, |i, j| {
 			self.at(i,j) + rhs.at(i,j)
 		})
@@ -254,8 +278,8 @@ impl<T:Add<T,T>+Mul<T,T>+Zero+Clone> Mul<Matrix<T>, Matrix<T>> for Matrix<T> {
 		//! Return the product of multiplying two matrices.
 		//! MxR matrix * RxN matrix = MxN matrix.
 		//! If inner dimensions don't match, fail.
-		assert!(self.n == (*rhs).m);
-		Matrix::from_fn(self.m, (*rhs).n, |i,j| {
+		assert_eq!(self.n, rhs.m);
+		Matrix::from_fn(self.m, rhs.n, |i,j| {
 			self.row(i).dot(&rhs.col(j))
 		})
 	}
