@@ -160,7 +160,7 @@ impl<T:Num+NumCast+Clone+Signed+Orderable> Matrix<T> {
 		}
 		pivot
 	}
-	pub fn plu_decomp(&self) -> (Matrix<T>, Matrix<f64>, Matrix<f64>) {
+	pub fn lu(&self) -> (Matrix<T>, Matrix<f64>, Matrix<f64>) {
 		//! Perform the LU decomposition of square matrix self, and return
 		//! the tuple (P,L,U) where P*self = L*U, and L and U are triangular.
 		assert_eq!(self.m, self.n);
@@ -189,7 +189,7 @@ impl<T:Num+NumCast+Clone+Signed+Orderable> Matrix<T> {
 	pub fn det(&self) -> f64 {
 		//! Return the determinant of square matrix self
 		//! via LU decomposition.
-		match self.plu_decomp() {
+		match self.lu() {
 			// |L|=1 because it L is unitriangular
 			// |P|=1 or -1 because it's a permutation matrix
 			// |U|=product of U's diagonal
