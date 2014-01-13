@@ -93,7 +93,7 @@ impl<T:Clone, U> Matrix<T> {
 }
 
 // methods for Matrix of numbers
-impl<T:Num+Clone> Matrix<T> {
+impl<T:Add<T,T>+Mul<T,T>+Zero+Clone> Matrix<T> {
 	pub fn sum(&self) -> T {
 		//! Return the summation of all elements in self.
 		let mut acc : T = Zero::zero();
@@ -220,7 +220,7 @@ impl<T:Eq+Clone> Eq for Matrix<T> {
 }
 
 // use + to add matrices
-impl<T:Num+Clone> Add<Matrix<T>,Matrix<T>> for Matrix<T> {
+impl<T:Add<T,T>+Clone> Add<Matrix<T>,Matrix<T>> for Matrix<T> {
 	fn add(&self, rhs: &Matrix<T>) -> Matrix<T> {
 		//! Return the sum of two matrices with the same dimensions.
 		//! If sizes don't match, fail.
@@ -232,7 +232,7 @@ impl<T:Num+Clone> Add<Matrix<T>,Matrix<T>> for Matrix<T> {
 }
 
 // use unary - to negate matrices
-impl<T:Num+Clone> Neg<Matrix<T>> for Matrix<T> {
+impl<T:Neg<T>+Clone> Neg<Matrix<T>> for Matrix<T> {
 	fn neg(&self) -> Matrix<T> {
 		//! Return a matrix of the negation of each value in self.
 		self.map(|n| { -n })
@@ -240,7 +240,7 @@ impl<T:Num+Clone> Neg<Matrix<T>> for Matrix<T> {
 }
 
 // use binary - to subtract matrices
-impl<T:Num+Clone> Sub<Matrix<T>, Matrix<T>> for Matrix<T> {
+impl<T:Neg<T>+Add<T,T>+Clone> Sub<Matrix<T>, Matrix<T>> for Matrix<T> {
 	fn sub(&self, rhs: &Matrix<T>) -> Matrix<T> {
 		//! Return the difference of two matrices with the same dimensions.
 		//! If sizes don't match, fail.
@@ -249,7 +249,7 @@ impl<T:Num+Clone> Sub<Matrix<T>, Matrix<T>> for Matrix<T> {
 }
 
 // use * to multiply matrices
-impl<T:Num+Clone> Mul<Matrix<T>, Matrix<T>> for Matrix<T> {
+impl<T:Add<T,T>+Mul<T,T>+Zero+Clone> Mul<Matrix<T>, Matrix<T>> for Matrix<T> {
 	fn mul(&self, rhs: &Matrix<T>) -> Matrix<T> {
 		//! Return the product of multiplying two matrices.
 		//! MxR matrix * RxN matrix = MxN matrix.
