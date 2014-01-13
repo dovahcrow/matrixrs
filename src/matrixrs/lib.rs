@@ -2,7 +2,10 @@
 #[crate_type="lib"];
 
 use std::vec;
+use std::num;
 use std::num::Zero;
+use std::num::One;
+use std::num::abs;
 
 /// Matrix
 /// ------
@@ -80,7 +83,9 @@ impl<T:Clone> Matrix<T> {
 			}
 		}
 	}
-	pub fn map(&self, mapper : |T| -> T) -> Matrix<T> {
+}
+impl<T:Clone, U> Matrix<T> {
+	pub fn map(&self, mapper : |T| -> U) -> Matrix<U> {
 		//! Return a copy of self where each value has been
 		//! operated upon by mapper.
 		Matrix::from_fn(self.m, self.n, |i,j| { mapper(self.at(i,j)) })
@@ -105,13 +110,92 @@ impl<T:Num+Clone> Matrix<T> {
 	}
 }
 
-impl<T:ToStr+Clone> ToStr for Matrix<T> {
+impl<T:NumCast+Clone> Matrix<T> {
+	pub fn to_f64(&self) -> Matrix<f64> {
+		//! Return a new Matrix with all of the elements of self cast to f64.
+		self.map(|n| -> f64 { num::cast(n).unwrap() })
+	}
+}
+
+impl<T:NumCast+Clone, U:NumCast+Clone> Matrix<T> {
+	pub fn approx_eq(&self, other: &Matrix<U>, threshold : f64) -> bool {
+		//! Return whether all of the elements of self are within
+		//! threshold of all of the corresponding elements of other.
+		let other_f64 = other.to_f64();
+		let self_f64 = self.to_f64();
+		let mut equal = true;
+		self.apply(|i,j| {
+			equal = if abs(self_f64.at(i,j) - other_f64.at(i,j)) <= threshold {
+				equal
+			} else {
+				false
+			};
+		});
+		equal
+	}
+}
+
+impl<T:Num+NumCast+Clone+Signed+Orderable> Matrix<T> {
+	fn doolittle_pivot(&self) -> Matrix<T> {
+		//! Return the pivoting matrix for self (for Doolittle algorithm)
+		//! Assume that self is a square matrix.
+		// initialize with a type T identity matrix
+		let mut pivot = Matrix::from_fn(self.m, self.n, |i, j| {
+			if i == j { One::one() } else { Zero::zero() }
+		});
+		// rearrange pivot matrix so max of each column of self is on
+		// the diagonal of self when multiplied by the pivot
+		for j in range(0,self.n) {
+			let mut row_max = j;
+			for i in range(j,self.m) {
+				if abs(self.at(i,j)) > abs(self.at(row_max, j)) {
+					row_max = i;
+				}
+			}
+			// swap the maximum row with the current one
+			let tmp = pivot.data[j].to_owned();
+			pivot.data[j] = pivot.data[row_max].to_owned();
+			pivot.data[row_max] = tmp;
+		}
+		pivot
+	}
+	pub fn plu_decomp(&self) -> (Matrix<T>, Matrix<f64>, Matrix<f64>) {
+		//! Perform the LU decomposition of square matrix self, and return
+		//! the tuple (P,L,U) where P*self = L*U.
+		assert!(self.m == self.n);
+		let P = self.doolittle_pivot();
+		let PM = (P*(*self)).to_f64();
+		let mut L = zeros(self.m, self.n);
+		let mut U = zeros(self.m, self.n);
+		for j in range(0, self.n) {
+			L.data[j][j] = 1.0;
+			for i in range(0, j+1) {
+				let mut uppersum = 0.0;
+				for k in range(0,i) {
+					uppersum += U.at(k,j)*L.at(i,k);
+				}
+				U.data[i][j] = PM.at(i,j) - uppersum;
+			}
+			for i in range(j, self.m) {
+				let mut lowersum = 0.0;
+				for k in range(0,j) {
+					lowersum += U.at(k,j)*L.at(i,k);
+				}
+				L.data[i][j] = (PM.at(i,j) - lowersum) / U.at(j,j);
+			}
+		}
+		(P, L, U)
+	}
+}
+
+impl<T:Clone+NumCast> ToStr for Matrix<T> {
 	fn to_str(&self) -> ~str {
 		//! Return a string representation of Matrix self.
+		let self_to_f64 = self.to_f64();
 		let mut repr = ~"";
 		for i in range(0, self.m) {
 			for j in range(0, self.n) {
-				repr.push_str(format!("{:>6s}", self.at(i,j).to_str()));
+				repr.push_str(format!("{:>.6f}  ", self_to_f64.at(i,j)));
 			}
 			repr.push_char(if (i + 1) == self.n { ' ' } else { '\n' });
 		}
@@ -121,7 +205,7 @@ impl<T:ToStr+Clone> ToStr for Matrix<T> {
 
 impl<T:Eq+Clone> Eq for Matrix<T> {
 	fn eq(&self, rhs: &Matrix<T>) -> bool {
-		//! Test equality of two matrices.
+		//! Return whether the elements of self equal the elements of rhs.
 		if self.size() == rhs.size() {
 			let mut equal = true;
 			self.apply(|i,j| {

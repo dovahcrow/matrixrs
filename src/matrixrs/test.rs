@@ -7,6 +7,7 @@ fn test_to_str() {
 	let m = Matrix{m:3,n:3,data:~[~[8,1,6],~[3,5,7],~[4,9,2]]};
 	let m_str = m.to_str();
 	println!("{:s}", m_str);
+	println!("^Make sure this looks okay^");
 }
 
 #[test]
@@ -149,4 +150,17 @@ fn test_row() {
 	assert!(m.row(1) == m_row1);
 	let m_row2 = Matrix{m:1,n:3,data:~[~[4,9,2]]};
 	assert!(m.row(2) == m_row2);
+}
+
+#[test]
+fn test_plu_decomp() {
+	let m = Matrix{m:4,n:4,data:~[~[7,3,-1,2],~[3,8,1,-4],~[-1,1,4,-1],~[2,-4,-1,6]]};
+	let p_exp = Matrix{m:4,n:4,data:~[~[1,0,0,0],~[0,1,0,0],~[0,0,1,0],~[0,0,0,1]]};
+	match m.plu_decomp() {
+		(P, L, U) => {
+			assert_eq!(P, p_exp);
+			// m*P should equal L*U, but we'll give a little room for rounding
+			assert!((L*U).approx_eq(&(m*P), 0.01));
+		}
+	}
 }
