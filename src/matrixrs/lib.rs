@@ -7,8 +7,7 @@ use std::num::Zero;
 use std::num::One;
 use std::num::abs;
 
-/// Matrix
-/// ------
+/// Matrix -- 
 /// Generic 2D Matrix implementation in Rust.
 pub struct Matrix<T> {
 	/// Number of rows
@@ -24,6 +23,11 @@ impl<T> Matrix<T> {
 	pub fn from_fn(m : uint, n : uint, func : |uint, uint| -> T) -> Matrix<T> {
 		//! Create an m-by-n matrix by using a function func
 		//! that returns a number given row and column.
+		//!
+		//! ```rust
+		//! # use matrixrs::Matrix;
+		//! assert_eq!(Matrix::from_fn(2, 2, |i,j| { i+j }), Matrix{m:2,n:2,data:~[~[0,1],~[1,2]]});
+		//! ```
 		let mut data = vec::with_capacity(m);
 		for i in range(0, m) {
 			data.push(vec::from_fn(n, |j:uint| -> T { func(i, j) }));
@@ -39,12 +43,18 @@ impl<T> Matrix<T> {
 impl<T:Clone> Matrix<T> {
 	pub fn from_T(m : uint, n : uint, val : T) -> Matrix<T> {
 		//! Create an m-by-n matrix, where each element is a clone of val.
+		//!
+		//! ```rust
+		//! # use matrixrs::Matrix;
+		//! assert_eq!(Matrix::from_T(2, 2, 10), Matrix{m:2,n:2,data:~[~[10,10],~[10,10]]});
+		//! ```
 		let mut data = vec::with_capacity(m);
 		for _ in range(0, m) {
 			data.push(vec::from_elem(n, val.clone()));
 		}
 		Matrix{m:m, n:n, data:data}
 	}
+	//pub fn from_diag(diag : ~[T], k : int)
 	fn at(&self, row : uint, col : uint) -> T {
 		//! Return the element at row, col.
 		//! Wrapped by Index trait.
@@ -52,16 +62,27 @@ impl<T:Clone> Matrix<T> {
 	}
 	pub fn row(&self, row : uint) -> Matrix<T> {
 		//! Return specified row from an MxN matrix as a 1xN matrix.
+		//!
+		//! ```rust
+		//! # use matrixrs::Matrix;
+		//! assert_eq!(Matrix{m:2,n:1,data:~[~[1],~[2]]}.row(0), Matrix{m:1,n:1,data:~[~[1]]});
+		//! ```
 		Matrix{m: 1, n:self.n, data: ~[self.data[row].to_owned()]}
 	}
 	pub fn col(&self, col : uint) -> Matrix<T> {
 		//! Return specified col from an MxN matrix as an Mx1 matrix.
+		//!
+		//! ```rust
+		//! # use matrixrs::Matrix;
+		//! assert_eq!(Matrix{m:2,n:2,data:~[~[1,3],~[2,4]]}.col(1), Matrix{m:2,n:1,data:~[~[3],~[4]]});
+		//! ```
 		let mut c = vec::with_capacity(self.m);
 		for i in range(0, self.m) {
 			c.push(~[self.at(i, col)]);
 		}
 		Matrix{m: self.m, n: 1, data: c}
 	}
+	//pub fn diag(&self, k : int) -> Matrix<T>
 	pub fn augment(&self, mat : &Matrix<T>) -> Matrix<T> {
 		//! Return a new matrix, self augmented by matrix mat.
 		//! An MxN matrix augmented with an MxC matrix produces an Mx(N+C) matrix.
@@ -83,6 +104,13 @@ impl<T:Clone> Matrix<T> {
 			}
 		}
 	}
+	pub fn fold(&self, init : T, folder: |T,T| -> T) -> T {
+		//! Call a folder function that acts as if it flattens the matrix
+		//! onto one row and then folds across.
+		let mut acc = init;
+		self.apply(|i,j| { acc = folder(acc.clone(), self.at(i,j)); });
+		acc
+	}
 }
 
 impl<T:Clone, U> Matrix<T> {
@@ -97,13 +125,11 @@ impl<T:Clone, U> Matrix<T> {
 impl<T:Add<T,T>+Mul<T,T>+Zero+Clone> Matrix<T> {
 	pub fn sum(&self) -> T {
 		//! Return the summation of all elements in self.
-		let mut acc : T = Zero::zero();
-		self.apply(|i,j| { acc = acc+self.at(i,j) });
-		acc
+		self.fold(num::zero(), |a,b| { a + b })
 	}
 	fn dot(&self, other: &Matrix<T>) -> T {
 		//! Return the product of the first row in self with the first row in other.
-		let mut sum : T = Zero::zero();
+		let mut sum : T = num::zero();
 		for i in range(0, self.n) {
 			sum = sum + self.at(0, i) * other.at(i, 0);
 		}
@@ -142,7 +168,7 @@ impl<T:Num+NumCast+Clone+Signed+Orderable> Matrix<T> {
 		//! Assume that self is a square matrix.
 		// initialize with a type T identity matrix
 		let mut pivot = Matrix::from_fn(self.m, self.n, |i, j| {
-			if i == j { One::one() } else { Zero::zero() }
+			if i == j { num::one() } else { num::zero() }
 		});
 		// rearrange pivot matrix so max of each column of self is on
 		// the diagonal of self when multiplied by the pivot
