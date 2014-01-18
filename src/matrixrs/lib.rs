@@ -3,12 +3,9 @@
 
 use std::vec;
 use std::num;
-use std::num::Zero;
-use std::num::One;
 use std::num::abs;
 
-/// Matrix -- 
-/// Generic 2D Matrix implementation in Rust.
+/// Matrix -- Generic 2D Matrix implementation in Rust.
 pub struct Matrix<T> {
 	/// Number of rows
 	m : uint,
@@ -122,9 +119,14 @@ impl<T:Clone, U> Matrix<T> {
 }
 
 // methods for Matrix of numbers
-impl<T:Add<T,T>+Mul<T,T>+Zero+Clone> Matrix<T> {
+impl<T:Add<T,T>+Mul<T,T>+num::Zero+Clone> Matrix<T> {
 	pub fn sum(&self) -> T {
 		//! Return the summation of all elements in self.
+		//!
+		//! ```rust
+		//! # use matrixrs::Matrix;
+		//! assert_eq!(Matrix{m:2,n:2,data:~[~[1,3],~[2,4]]}.sum(), 10);
+		//! ```
 		self.fold(num::zero(), |a,b| { a + b })
 	}
 	fn dot(&self, other: &Matrix<T>) -> T {
@@ -215,6 +217,7 @@ impl<T:Num+NumCast+Clone+Signed+Orderable> Matrix<T> {
 	pub fn det(&self) -> f64 {
 		//! Return the determinant of square matrix self
 		//! via LU decomposition.
+		//! If not a square matrix, fail.
 		match self.lu() {
 			// |L|=1 because it L is unitriangular
 			// |P|=1 or -1 because it's a permutation matrix
@@ -225,7 +228,7 @@ impl<T:Num+NumCast+Clone+Signed+Orderable> Matrix<T> {
 				let mut swaps = 0;
 				for i in range(0, self.m) {
 					prod *= U.at(i,i);
-					swaps += if P.at(i,i) == One::one() { 0 } else { 1 };
+					swaps += if P.at(i,i) == num::one() { 0 } else { 1 };
 				}
 				// flip the sign of the determinant based on swaps of P
 				if (swaps/2) % 2 == 1 {
@@ -299,7 +302,7 @@ impl<T:Neg<T>+Add<T,T>+Clone> Sub<Matrix<T>, Matrix<T>> for Matrix<T> {
 }
 
 // use * to multiply matrices
-impl<T:Add<T,T>+Mul<T,T>+Zero+Clone> Mul<Matrix<T>, Matrix<T>> for Matrix<T> {
+impl<T:Add<T,T>+Mul<T,T>+num::Zero+Clone> Mul<Matrix<T>, Matrix<T>> for Matrix<T> {
 	fn mul(&self, rhs: &Matrix<T>) -> Matrix<T> {
 		//! Return the product of multiplying two matrices.
 		//! MxR matrix * RxN matrix = MxN matrix.
