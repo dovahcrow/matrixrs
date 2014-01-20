@@ -74,6 +74,14 @@ fn test_mul() {
 }
 
 #[test]
+fn test_exp() {
+	let m = Matrix{m:3,n:3,data:~[~[8,1,6],~[3,5,7],~[4,9,2]]};
+	let m_exp_3 = Matrix{m:3, n:3, data:~[~[1197,1029,1149],
+					~[1077,1125,1173],~[1101,1221,1053]]};
+	assert_eq!(m^3, m_exp_3);
+}
+
+#[test]
 fn test_not() {
 	let m1 = Matrix{m:2, n:2, data: ~[~[1,1],~[2,2]]};
 	let m1_tpose = Matrix{m:2, n:2, data:~[~[1,2],~[1,2]]};

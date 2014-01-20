@@ -340,6 +340,22 @@ impl<T:Clone> BitOr<Matrix<T>,Matrix<T>> for Matrix<T> {
 	}
 }
 
+// use ^ to exponentiate matrices
+impl<T:Add<T,T>+Mul<T,T>+num::Zero+Clone> BitXor<uint, Matrix<T>> for Matrix<T> {
+	fn bitxor(&self, rhs: &uint) -> Matrix<T> {
+		//! Return a matrix of self raised to the power of rhs.
+		//! Self must be a square matrix.
+		assert_eq!(self.m, self.n);
+		let mut ret = Matrix::from_fn(self.m, self.n, |i,j| {
+			self.at(i, j)
+		});
+		for _ in range(1, *rhs) {
+			ret = self*ret;
+		}
+		ret
+	}
+}
+
 // convenience constructors
 pub fn zeros(m : uint, n : uint) -> Matrix<f64> {
 	//! Create an MxN zero matrix of type f64.
