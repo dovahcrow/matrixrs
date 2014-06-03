@@ -2,6 +2,8 @@
 
 ### Quick Setup
 
+due to abandon of rustpkg, use bare rustc before cargo is mature enough
+
 ```
-rustpkg install github.com/pelmers/matrixrs.git
+rustc matrixrs.rs
 ```
