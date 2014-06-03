@@ -11,6 +11,7 @@ use std::num;
 use std::num::abs;
 use std::cmp::{Eq, TotalOrd};
 use std::owned::Box;
+use std::fmt::Formatter;
 
 /// Matrix -- Generic 2D Matrix implementation in Rust.
 pub struct Matrix<T> {
@@ -119,6 +120,21 @@ impl<T:Clone> Matrix<T> {
 	}
 }
 
+impl<T:std::fmt::Show> std::fmt::Show for Matrix<T> {
+	fn fmt(&self, fmt: &mut Formatter) -> std::fmt::Result {
+		// write!(fmt, "\n");
+		for i in self.data.iter() {
+			write!(fmt, "|");
+			for v in i.iter() {
+				write!(fmt, " {}", v);
+			}
+			write!(fmt, " |\n");
+		}
+		// write!(fmt, "\n");
+		Ok(())
+	}
+}
+	
 impl<T:Clone, U> Matrix<T> {
 	pub fn map(&self, mapper : |T| -> U) -> Matrix<U> {
 		//! Return a copy of self where each value has been
