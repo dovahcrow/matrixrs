@@ -1,4 +1,4 @@
-#![crate_id = "matrixrs#0.2"]
+#![crate_id = "matrixrs#0.21"]
 #![crate_type="lib"]
 #![allow(unused_must_use)]
 
@@ -7,16 +7,44 @@ use std::num::{abs,zero,one,Zero};
 use std::cmp::{PartialOrd};
 use std::fmt::{Formatter,Show};
 use std::vec::Vec;
+// use std::slice::Items;
+use std::iter::Iterator;
 /// Matrix -- Generic 2D Matrix implementation in Rust.
 pub struct Matrix<T> {
 	/// Number of rows
-	row : uint,
+	row: uint,
 	/// Number of columns
-	col : uint,
+	col: uint,
 	/// Table (Vector of Vector) of data values in the matrix
-	data : Vec<Vec<T>>
+	/// its a vec of rows which are vecs of elems
+	data: Vec<Vec<T>>
 }
 
+pub struct MatrixIter<'a,T> {
+	matrix: &'a Matrix<T>,
+	curr_row: uint,
+	curr_col: uint
+}
+
+impl<'a,T:Clone> Iterator<T> for MatrixIter<'a,T> {
+	fn next(&mut self) -> Option<T> {
+		// let (row, col) = (self.matrix.row, self.matrix.col);
+		match (self.curr_row, self.curr_col) {
+			(ref mut row, ref mut col) if *row < self.matrix.row && *col < self.matrix.col => {
+				let tmp = self.matrix.at(*row, *col);
+				if self.matrix.col == *col + 1 {
+					self.curr_row += 1;
+					self.curr_col = 0;	
+				} else {
+					self.curr_col +=1;
+				}
+				Some(tmp)
+			}
+			_ => None
+		}
+		
+	}
+}
 
 impl<T> Matrix<T> {
 	pub fn from_fn(row : uint, col : uint, func : |uint, uint| -> T) -> Matrix<T> {
@@ -55,17 +83,21 @@ impl<T:Clone> Matrix<T> {
 			data: range(0, row).map(|_| Vec::from_elem(col, val.clone())).collect()
 		}
 	}
+
 	//pub fn from_diag(diag : ~[T], k : int)
 	pub fn at(&self, row: uint, col: uint) -> T {
 		//! Return the element at row, col.
 		//! Wrapped by Index trait.
 		self.data.get(row).get(col).clone()
 	}
+
+	// return a vec of row
 	pub fn row_vec(&self, row: uint) -> Vec<T> {
 		let mut v = Vec::new();
 		v.clone_from(self.data.get(row));
 		v
 	}
+
 	pub fn row(&self, row: uint) -> Matrix<T> {
 		//! Return specified row from an MxN matrix as a 1xN matrix.
 		//!
@@ -73,15 +105,18 @@ impl<T:Clone> Matrix<T> {
 		//! # use matrixrs::Matrix;
 		//! assert_eq!(Matrix{m:2,n:1,data:~[~[1],~[2]]}.row(0), Matrix{m:1,n:1,data:~[~[1]]});
 		//! ```
-		Matrix{row: 1, col: self.col, data: vec!(self.row_vec(row))}
-	}
-	pub fn col_vec(&self, col: uint) -> Vec<T> {
-		let mut c = Vec::with_capacity(self.row);
-		for i in range(0, self.row) {
-			c.push(self.at(i, col));
+		Matrix {
+			row: 1,
+			col: self.col,
+			data: vec![self.row_vec(row)]
 		}
-		c
 	}
+
+	// return a vec of column
+	pub fn col_vec(&self, col: uint) -> Vec<T> {
+		range(0, self.row).map(|i| self.at(i, col)).collect::<Vec<T>>()
+	}
+
 	pub fn col(&self, col: uint) -> Matrix<T> {
 		//! Return specified col from an MxN matrix as an Mx1 matrix.
 		//!
@@ -89,17 +124,18 @@ impl<T:Clone> Matrix<T> {
 		//! # use matrixrs::Matrix;
 		//! assert_eq!(Matrix{m:2,n:2,data:~[~[1,3],~[2,4]]}.col(1), Matrix{m:2,n:1,data:~[~[3],~[4]]});
 		//! ```
-		let mut c = Vec::with_capacity(self.row);
-		for i in range(0, self.row) {
-			c.push(vec![self.at(i, col)]);
+		Matrix {
+			row: self.row,
+			col: 1,
+			data: vec![self.col_vec(col)]
 		}
-		Matrix{row: self.row, col: 1, data: c}
 	}
+
 	//pub fn diag(&self, k : int) -> Matrix<T>
 	pub fn augment(&self, mat: &Matrix<T>) -> Matrix<T> {
 		//! Return a new matrix, self augmented by matrix mat.
 		//! An MxN matrix augmented with an MxC matrix produces an Mx(N+C) matrix.
-		Matrix::from_fn(self.row, self.col+mat.col, |i,j| {
+		Matrix::from_fn(self.row, self.col + mat.col, |i,j| {
 			if j < self.col {
 				self.at(i, j) 
 			} else {
@@ -107,12 +143,14 @@ impl<T:Clone> Matrix<T> {
 			}
 		})
 	}
+
 	pub fn transpose(&self) -> Matrix<T> {
 		//! Return the transpose of the matrix.
 		//! The transpose of a matrix MxN has dimensions NxM.
 		Matrix::from_fn(self.col, self.row, |i,j| { self.at(j, i) })
 	}
-	pub fn apply(&self, applier : |uint, uint|) {
+
+	pub fn apply(&self, applier: |uint, uint|) {
 		//! Call an applier function with each index in self.
 		//! Input to applier is two parameters: row, col.
 		for i in range(0, self.row) {
@@ -121,6 +159,7 @@ impl<T:Clone> Matrix<T> {
 			}
 		}
 	}
+
 	pub fn fold(&self, init: T, folder: |T,T| -> T) -> T {
 		//! Call a folder function that acts as if it flattens the matrix
 		//! onto one row and then folds across.
@@ -128,6 +167,14 @@ impl<T:Clone> Matrix<T> {
 		self.apply(|i,j| { acc = folder(acc.clone(), self.at(i,j)); });
 
 		acc
+	}
+
+	pub fn iter<'a>(&'a self) -> MatrixIter<'a,T> {
+		MatrixIter {
+			matrix: self,
+			curr_row: 0,
+			curr_col: 0
+		}
 	}
 }
 
