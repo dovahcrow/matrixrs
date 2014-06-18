@@ -5,7 +5,8 @@
 #![crate_type="lib"]
 #![allow(unused_must_use)]
 #![deny(missing_doc)]
-
+#![feature(macro_rules)]
+extern crate debug;
 use std::num;
 use std::num::{abs,zero,one,Zero,One};
 use std::cmp::{PartialOrd};
@@ -13,6 +14,7 @@ use std::fmt::{Formatter,Show};
 use std::vec::Vec;
 use std::iter::Iterator;
 use std::iter::FromIterator;
+use std::slice::Items;
 
 /// The Matrix struct represent a matrix
 pub struct Matrix<T> {
@@ -69,6 +71,38 @@ impl<T:Clone> Matrix<T> {
 		}
 	}
 
+	pub fn from_vec(row: uint, col: uint, vals: Vec<T>) -> Matrix<T> {
+		//!
+		assert_eq!(row * col, vals.len());
+		let mut v_iter = vals.iter();
+			Matrix {
+       		col: col,
+       		row: row,
+       		data: range(0,row).map(
+       			|_| v_iter.by_ref().take(col).map(|x| x.clone()).collect()
+       			).collect()
+       	}
+		
+	}
+
+	pub fn from_vecvec(vals: Vec<Vec<T>>) -> Matrix<T> {
+		//!
+		let row = vals.len();
+		if row == 0 {
+			return Matrix {
+				row: 0,
+				col: 0,
+				data: vec!(vec!())
+			}
+		}
+		let col = vals.get(0).len();
+		Matrix {
+			row: row,
+			col: col,
+			data: vals
+		}
+	}
+
 	pub fn at(&self, row: uint, col: uint) -> T {
 		//! Return the element at row, col.
 		//! Wrapped by Index trait.
@@ -119,10 +153,14 @@ impl<T:Clone> Matrix<T> {
 		//!		Matrix{m: 2, n: 1, data: vec![vec![3], vec![4]]}
 		//! );
 		//! ```
+		let mut cols: Vec<Vec<T>> = Vec::new();
+		for v in self.col_vec(col).iter() {
+			cols.push(vec![v.clone()]);
+		}
 		Matrix {
 			row: self.row,
 			col: 1,
-			data: vec![self.col_vec(col)]
+			data: cols
 		}
 	}
 
@@ -222,7 +260,7 @@ impl<T:Add<T,T>+Mul<T,T>+Zero+Clone> Matrix<T> {
 
 	fn dot(&self, other: &Matrix<T>) -> T {
 		//! Return the product of the first row in self with the first row in other.
-		range(0, self.col).fold(zero(), |acc: T, i| acc + self.at(0, i) * other.at(i, 0))
+		range(0, self.col).fold(zero(), |acc: T, i| {acc + self.at(0, i) * other.at(i, 0)})
 	}
 }
 
@@ -306,7 +344,6 @@ impl<T:Num+NumCast+Clone+Signed+PartialOrd> Matrix<T> {
 					lowersum += u.at(k,j)*l.at(i,k);
 				}
 				l.data.as_mut_slice()[i].as_mut_slice()[j] = (pm.at(i,j) - lowersum) / u.at(j,j);
-				// println!("{:?}",l.at(i,j));
 			}
 		}
 		Ok((p, l, u))
@@ -383,8 +420,8 @@ impl<T:Add<T,T>+Mul<T,T>+Zero+Clone> Mul<Matrix<T>, Matrix<T>> for Matrix<T> {
 		//! MxR matrix * RxN matrix = MxN matrix.
 		//! If inner dimensions don't match, fail.
 
-		assert_eq!(self.col, rhs.col);
-		Matrix::from_fn(self.row, rhs.row, |i,j| {
+		assert_eq!(self.col, rhs.row);
+		Matrix::from_fn(self.row, rhs.col, |i,j| {
 			self.row(i).dot(&rhs.col(j))
 		})
 	}
@@ -444,6 +481,11 @@ impl<T:Add<T,T>+Mul<T,T>+num::Zero+Clone> BitXor<uint, Matrix<T>> for Matrix<T> 
 	}
 }
 
+// impl<T:Zero> Zero for Matrix<T> {
+// 	fn zero() -> Matrix<T> {
+
+// 	}
+// }
 // convenience constructors
 pub fn zeros<T:Zero+Clone>(row : uint, col : uint) -> Matrix<T> {
 	//! Create an MxN zero matrix of type which implements num::Zero trait.
@@ -500,7 +542,7 @@ impl<T:Clone> Matrix<T> {
 /// convert from an iterator
 impl<T:Clone> FromIterator<T> for Matrix<T> {
 
-	/// convert to a square matrix that some elements might be truncated 
+	/// convert to a matrix from iterator where first elem of
     fn from_iter<I: Iterator<T>>(mut iterator: I) -> Matrix<T> {
     	//!
     	//! ```
@@ -531,6 +573,18 @@ impl<T:Clone> FromIterator<T> for Matrix<T> {
     }
 }
 
+impl<'a,T:Clone> MatrixIter<'a,T> {
+	pub fn rows(self) -> Items<'a,Vec<T>> {
+		//!
+		self.matrix.data.iter()
+	}
+
+	// pub fn cols(self) -> Items<'a,Vec<T>> {
+	// 	//!
+	// 	let m = self.matrix.transpose();
+	// 	m.iter().rows()
+	// }
+}
 impl<'a,T:Clone> Iterator<T> for MatrixIter<'a,T> {
 	fn next(&mut self) -> Option<T> {
 		match (self.curr_row, self.curr_col) {
@@ -548,3 +602,28 @@ impl<'a,T:Clone> Iterator<T> for MatrixIter<'a,T> {
 		
 	}
 }
+
+//-----------------------------------------------------------------
+// macro_rules! matrix (
+// 	($(|$($elem:expr) +|)+) => (
+// 		let mut v = Vec::new();
+// 		$(
+// 			let mut vsub = Vec::new();
+// 			$(
+// 				vsub.push($elem)
+// 			)+
+// 			v.push(vsub);
+// 		)+
+
+// 		let len = v.iter().next().len();
+// 		for vs in v.iter() {
+// 			assert_eq(len,vs.len());
+// 		}
+
+// 		Matrix {
+// 			row: v.len();
+// 			col: len;
+// 			data: v
+// 		}
+// 	)
+// )
