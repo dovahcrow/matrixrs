@@ -39,18 +39,18 @@
     </nav>
 
     <section id='main' class="content trait">
-<h1 class='fqn'>Trait <a href='index.html'>matrixrs</a>::<a class='trait' href=''>ToMatrix</a><a class='source' id='src-2766' href='../src/matrixrs/matrixrs.rs.html#469-472'>[src]</a></h1>
-<pre class='rust trait'>pub trait ToMatrix {
-    fn <a href='#tymethod.to_matrix' class='fnname'>to_matrix</a>(&amp;self, row: <a href='http://doc.rust-lang.org/std/primitive.uint.html'>uint</a>, col: <a href='http://doc.rust-lang.org/std/primitive.uint.html'>uint</a>) -&gt; <a class='struct' href='../matrixrs/struct.Matrix.html' title='matrixrs::Matrix'>Matrix</a>&lt;Self&gt;;
+<h1 class='fqn'>Trait <a href='index.html'>matrixrs</a>::<a class='trait' href=''>ToMatrix</a><a class='source' id='src-3067' href='../src/matrixrs/lib.rs.html#502-505'>[src]</a></h1>
+<pre class='rust trait'>pub trait ToMatrix&lt;T&gt; {
+    fn <a href='#tymethod.to_matrix' class='fnname'>to_matrix</a>(&amp;mut self, row: <a href='http://doc.rust-lang.org/std/primitive.uint.html'>uint</a>, col: <a href='http://doc.rust-lang.org/std/primitive.uint.html'>uint</a>) -&gt; <a class='struct' href='../matrixrs/struct.Matrix.html' title='matrixrs::Matrix'>Matrix</a>&lt;T&gt;;
 }</pre><div class='docblock'><p>A trait that convert T to Matrix<T></p>
 </div>
             <h2 id='required-methods'>Required Methods</h2>
             <div class='methods'>
-        <h3 id='tymethod.to_matrix' class='method'><code>fn <a href='#tymethod.to_matrix' class='fnname'>to_matrix</a>(&amp;self, row: <a href='http://doc.rust-lang.org/std/primitive.uint.html'>uint</a>, col: <a href='http://doc.rust-lang.org/std/primitive.uint.html'>uint</a>) -&gt; <a class='struct' href='../matrixrs/struct.Matrix.html' title='matrixrs::Matrix'>Matrix</a>&lt;Self&gt;</code></h3><div class='docblock'><p>The convertion function</p>
+        <h3 id='tymethod.to_matrix' class='method'><code>fn <a href='#tymethod.to_matrix' class='fnname'>to_matrix</a>(&amp;mut self, row: <a href='http://doc.rust-lang.org/std/primitive.uint.html'>uint</a>, col: <a href='http://doc.rust-lang.org/std/primitive.uint.html'>uint</a>) -&gt; <a class='struct' href='../matrixrs/struct.Matrix.html' title='matrixrs::Matrix'>Matrix</a>&lt;T&gt;</code></h3><div class='docblock'><p>The convertion function</p>
 </div></div>
         <h2 id='implementors'>Implementors</h2>
         <ul class='item-list' id='implementors-list'>
-    <li><code>impl&lt;T: <a class='trait' href='http://doc.rust-lang.org/core/clone/trait.Clone.html' title='core::clone::Clone'>Clone</a>&gt; <a class='trait' href='../matrixrs/trait.ToMatrix.html' title='matrixrs::ToMatrix'>ToMatrix</a> for T</code></li>
+    <li><code>impl&lt;T: <a class='trait' href='http://doc.rust-lang.org/core/clone/trait.Clone.html' title='core::clone::Clone'>Clone</a>, U: <a class='trait' href='http://doc.rust-lang.org/core/iter/trait.Iterator.html' title='core::iter::Iterator'>Iterator</a>&lt;T&gt;&gt; <a class='trait' href='../matrixrs/trait.ToMatrix.html' title='matrixrs::ToMatrix'>ToMatrix</a>&lt;T&gt; for U</code></li>
 </ul><script type="text/javascript" async
                               src="../implementors/matrixrs/trait.ToMatrix.js">
                       </script></section>

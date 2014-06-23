@@ -39,11 +39,16 @@
     </nav>
 
     <section id='main' class="content struct">
-<h1 class='fqn'>Struct <a href='index.html'>matrixrs</a>::<a class='struct' href=''>Matrix</a><a class='source' id='src-18' href='../src/matrixrs/matrixrs.rs.html#18-28'>[src]</a></h1>
+<h1 class='fqn'>Struct <a href='index.html'>matrixrs</a>::<a class='struct' href=''>Matrix</a><a class='source' id='src-20' href='../src/matrixrs/lib.rs.html#22-32'>[src]</a></h1>
 <pre class='rust struct'>pub struct Matrix&lt;T&gt; {
+    pub row: <a href='http://doc.rust-lang.org/std/primitive.uint.html'>uint</a>,
+    pub col: <a href='http://doc.rust-lang.org/std/primitive.uint.html'>uint</a>,
     // some fields omitted
 }</pre><div class='docblock'><p>The Matrix struct represent a matrix</p>
-</div><h2 id='methods'>Methods</h2><h3 class='impl'><code>impl&lt;T&gt; <a class='struct' href='../matrixrs/struct.Matrix.html' title='matrixrs::Matrix'>Matrix</a>&lt;T&gt;</code></h3><div class='methods'><h4 id='method.from_fn' class='method'><code>fn <a href='#method.from_fn' class='fnname'>from_fn</a>(row: <a href='http://doc.rust-lang.org/std/primitive.uint.html'>uint</a>, col: <a href='http://doc.rust-lang.org/std/primitive.uint.html'>uint</a>, func: |<a href='http://doc.rust-lang.org/std/primitive.uint.html'>uint</a>, <a href='http://doc.rust-lang.org/std/primitive.uint.html'>uint</a>| -&gt; T) -&gt; <a class='struct' href='../matrixrs/struct.Matrix.html' title='matrixrs::Matrix'>Matrix</a>&lt;T&gt;</code></h4>
+</div><h2 class='fields'>Fields</h2>
+<table><tr><td id='structfield.row'><code>row</code></td><td><div class='docblock'><p>Number of rows</p>
+</div></td></tr><tr><td id='structfield.col'><code>col</code></td><td><div class='docblock'><p>Number of columns</p>
+</div></td></tr></table><h2 id='methods'>Methods</h2><h3 class='impl'><code>impl&lt;T&gt; <a class='struct' href='../matrixrs/struct.Matrix.html' title='matrixrs::Matrix'>Matrix</a>&lt;T&gt;</code></h3><div class='methods'><h4 id='method.from_fn' class='method'><code>fn <a href='#method.from_fn' class='fnname'>from_fn</a>(row: <a href='http://doc.rust-lang.org/std/primitive.uint.html'>uint</a>, col: <a href='http://doc.rust-lang.org/std/primitive.uint.html'>uint</a>, func: |<a href='http://doc.rust-lang.org/std/primitive.uint.html'>uint</a>, <a href='http://doc.rust-lang.org/std/primitive.uint.html'>uint</a>| -&gt; T) -&gt; <a class='struct' href='../matrixrs/struct.Matrix.html' title='matrixrs::Matrix'>Matrix</a>&lt;T&gt;</code></h4>
 <div class='docblock'><p>Create an m-by-n matrix by using a function func
 that returns a number given row and column.</p>
 <pre class='rust '>
@@ -54,7 +59,8 @@ that returns a number given row and column.</p>
 </pre>
 </div><h4 id='method.size' class='method'><code>fn <a href='#method.size' class='fnname'>size</a>(&amp;self) -&gt; <a href='http://doc.rust-lang.org/std/primitive.tuple.html'>(<a href='http://doc.rust-lang.org/std/primitive.uint.html'>uint</a>, <a href='http://doc.rust-lang.org/std/primitive.uint.html'>uint</a>)</a></code></h4>
 <div class='docblock'><p>Return the size of a Matrix as (row, column).</p>
-</div></div><h3 class='impl'><code>impl&lt;T: <a class='trait' href='http://doc.rust-lang.org/core/clone/trait.Clone.html' title='core::clone::Clone'>Clone</a>&gt; <a class='struct' href='../matrixrs/struct.Matrix.html' title='matrixrs::Matrix'>Matrix</a>&lt;T&gt;</code></h3><div class='methods'><h4 id='method.from_elem' class='method'><code>fn <a href='#method.from_elem' class='fnname'>from_elem</a>(row: <a href='http://doc.rust-lang.org/std/primitive.uint.html'>uint</a>, col: <a href='http://doc.rust-lang.org/std/primitive.uint.html'>uint</a>, val: T) -&gt; <a class='struct' href='../matrixrs/struct.Matrix.html' title='matrixrs::Matrix'>Matrix</a>&lt;T&gt;</code></h4>
+</div><h4 id='method.set' class='method'><code>fn <a href='#method.set' class='fnname'>set</a>(&amp;mut self, row: <a href='http://doc.rust-lang.org/std/primitive.uint.html'>uint</a>, col: <a href='http://doc.rust-lang.org/std/primitive.uint.html'>uint</a>, val: T)</code></h4>
+<div class='docblock'></div></div><h3 class='impl'><code>impl&lt;T: <a class='trait' href='http://doc.rust-lang.org/core/clone/trait.Clone.html' title='core::clone::Clone'>Clone</a>&gt; <a class='struct' href='../matrixrs/struct.Matrix.html' title='matrixrs::Matrix'>Matrix</a>&lt;T&gt;</code></h3><div class='methods'><h4 id='method.from_elem' class='method'><code>fn <a href='#method.from_elem' class='fnname'>from_elem</a>(row: <a href='http://doc.rust-lang.org/std/primitive.uint.html'>uint</a>, col: <a href='http://doc.rust-lang.org/std/primitive.uint.html'>uint</a>, val: T) -&gt; <a class='struct' href='../matrixrs/struct.Matrix.html' title='matrixrs::Matrix'>Matrix</a>&lt;T&gt;</code></h4>
 <div class='docblock'><p>Create an m-by-n matrix, where each element is a clone of val.</p>
 <pre class='rust '>
  <span class='macro'>assert_eq</span><span class='macro'>!</span>(
@@ -62,6 +68,8 @@ that returns a number given row and column.</p>
         <span class='ident'>Matrix</span> {<span class='ident'>m</span>: <span class='number'>2</span>, <span class='ident'>n</span>: <span class='number'>2</span>, <span class='ident'>data</span>: <span class='macro'>vec</span><span class='macro'>!</span>[<span class='macro'>vec</span><span class='macro'>!</span>[<span class='number'>10</span>,<span class='number'>10</span>], <span class='macro'>vec</span><span class='macro'>!</span>[<span class='number'>10</span>,<span class='number'>10</span>]]
     });
 </pre>
+</div><h4 id='method.from_vec' class='method'><code>fn <a href='#method.from_vec' class='fnname'>from_vec</a>(row: <a href='http://doc.rust-lang.org/std/primitive.uint.html'>uint</a>, col: <a href='http://doc.rust-lang.org/std/primitive.uint.html'>uint</a>, vals: <a class='struct' href='http://doc.rust-lang.org/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;T&gt;) -&gt; <a class='struct' href='../matrixrs/struct.Matrix.html' title='matrixrs::Matrix'>Matrix</a>&lt;T&gt;</code></h4>
+<div class='docblock'><p>deprecated use to_matrix in stead.</p>
 </div><h4 id='method.at' class='method'><code>fn <a href='#method.at' class='fnname'>at</a>(&amp;self, row: <a href='http://doc.rust-lang.org/std/primitive.uint.html'>uint</a>, col: <a href='http://doc.rust-lang.org/std/primitive.uint.html'>uint</a>) -&gt; T</code></h4>
 <div class='docblock'><p>Return the element at row, col.
 Wrapped by Index trait.</p>
@@ -142,7 +150,8 @@ If inner dimensions don&#39;t match, fail.</p>
 <div class='docblock'><p>Return the element at the location specified by a (row, column) tuple.</p>
 </div></div><h3 class='impl'><code>impl&lt;T: <a class='trait' href='http://doc.rust-lang.org/core/clone/trait.Clone.html' title='core::clone::Clone'>Clone</a>&gt; <a class='trait' href='http://doc.rust-lang.org/core/ops/trait.Not.html' title='core::ops::Not'>Not</a>&lt;<a class='struct' href='../matrixrs/struct.Matrix.html' title='matrixrs::Matrix'>Matrix</a>&lt;T&gt;&gt; for <a class='struct' href='../matrixrs/struct.Matrix.html' title='matrixrs::Matrix'>Matrix</a>&lt;T&gt;</code></h3><div class='docblock'><p>use ! to transpose matrices</p>
 </div><div class='methods'><h4 id='method.not' class='method'><code>fn <a href='#method.not' class='fnname'>not</a>(&amp;self) -&gt; <a class='struct' href='../matrixrs/struct.Matrix.html' title='matrixrs::Matrix'>Matrix</a>&lt;T&gt;</code></h4>
-<div class='docblock'><p>Return the transpose of self.</p>
+<div class='docblock'><p>Return the transpose of self.
+if you don&#39;t want to use this, use .transpose() in stead.</p>
 </div></div><h3 class='impl'><code>impl&lt;T: <a class='trait' href='http://doc.rust-lang.org/core/clone/trait.Clone.html' title='core::clone::Clone'>Clone</a>&gt; <a class='trait' href='http://doc.rust-lang.org/core/ops/trait.BitOr.html' title='core::ops::BitOr'>BitOr</a>&lt;<a class='struct' href='../matrixrs/struct.Matrix.html' title='matrixrs::Matrix'>Matrix</a>&lt;T&gt;, <a class='struct' href='../matrixrs/struct.Matrix.html' title='matrixrs::Matrix'>Matrix</a>&lt;T&gt;&gt; for <a class='struct' href='../matrixrs/struct.Matrix.html' title='matrixrs::Matrix'>Matrix</a>&lt;T&gt;</code></h3><div class='docblock'><p>use | to augment matrices</p>
 </div><div class='methods'><h4 id='method.bitor' class='method'><code>fn <a href='#method.bitor' class='fnname'>bitor</a>(&amp;self, rhs: &amp;<a class='struct' href='../matrixrs/struct.Matrix.html' title='matrixrs::Matrix'>Matrix</a>&lt;T&gt;) -&gt; <a class='struct' href='../matrixrs/struct.Matrix.html' title='matrixrs::Matrix'>Matrix</a>&lt;T&gt;</code></h4>
 <div class='docblock'><p>Return self augmented by matrix rhs.</p>
@@ -152,7 +161,7 @@ If inner dimensions don&#39;t match, fail.</p>
 Self must be a square matrix.</p>
 </div></div><h3 class='impl'><code>impl&lt;T: <a class='trait' href='http://doc.rust-lang.org/core/clone/trait.Clone.html' title='core::clone::Clone'>Clone</a>&gt; <a class='trait' href='http://doc.rust-lang.org/core/iter/trait.FromIterator.html' title='core::iter::FromIterator'>FromIterator</a>&lt;T&gt; for <a class='struct' href='../matrixrs/struct.Matrix.html' title='matrixrs::Matrix'>Matrix</a>&lt;T&gt;</code></h3><div class='docblock'><p>convert from an iterator</p>
 </div><div class='methods'><h4 id='method.from_iter' class='method'><code>fn <a href='#method.from_iter' class='fnname'>from_iter</a>&lt;I: <a class='trait' href='http://doc.rust-lang.org/core/iter/trait.Iterator.html' title='core::iter::Iterator'>Iterator</a>&lt;T&gt;&gt;(iterator: I) -&gt; <a class='struct' href='../matrixrs/struct.Matrix.html' title='matrixrs::Matrix'>Matrix</a>&lt;T&gt;</code></h4>
-<div class='docblock'><p>convert to a square matrix that some elements might be truncated</p>
+<div class='docblock'><p>convert to a matrix from iterator where first elem of</p>
 <pre class='rust '>
     <span class='kw'>let</span> <span class='ident'>v</span> <span class='op'>=</span> <span class='macro'>vec</span><span class='macro'>!</span>[<span class='number'>1</span>,<span class='number'>2</span>,<span class='number'>3</span>,<span class='number'>4</span>,<span class='number'>5</span>];
  <span class='kw'>let</span> <span class='ident'>m</span>: <span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>int</span><span class='op'>&gt;</span> <span class='op'>=</span> <span class='ident'>v</span>.<span class='ident'>iter</span>().<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>x</span><span class='op'>|</span> <span class='ident'>x</span>.<span class='ident'>clone</span>()).<span class='ident'>collect</span>();
@@ -163,7 +172,19 @@ Self must be a square matrix.</p>
  <span class='op'>|</span> <span class='number'>1</span> <span class='number'>2</span> <span class='op'>|</span>
  <span class='op'>|</span> <span class='number'>3</span> <span class='number'>4</span> <span class='op'>|</span>
 </pre>
-</div></div></section>
+<pre class='rust '>
+    <span class='kw'>let</span> <span class='ident'>v</span> <span class='op'>=</span> <span class='macro'>vec</span><span class='macro'>!</span>[<span class='number'>1</span>,<span class='number'>2</span>,<span class='number'>3</span>,<span class='number'>4</span>,<span class='number'>5</span>,<span class='number'>6</span>];
+ <span class='kw'>let</span> <span class='ident'>m</span>: <span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>int</span><span class='op'>&gt;</span> <span class='op'>=</span> <span class='ident'>v</span>.<span class='ident'>iter</span>().<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>x</span><span class='op'>|</span> <span class='ident'>x</span>.<span class='ident'>clone</span>()).<span class='ident'>to_matrix</span>(<span class='number'>2</span>,<span class='number'>3</span>);
+ <span class='macro'>println</span><span class='macro'>!</span>(<span class='string'>&quot;{}&quot;</span>,<span class='ident'>m</span>);
+
+ <span class='ident'>Output</span>:
+ <span class='op'>|</span> <span class='number'>1</span> <span class='number'>2</span> <span class='op'>|</span>
+ <span class='op'>|</span> <span class='number'>3</span> <span class='number'>4</span> <span class='op'>|</span>
+ <span class='op'>|</span> <span class='number'>5</span> <span class='number'>6</span> <span class='op'>|</span>
+</pre>
+</div></div><h3 id='derived_implementations'>Derived Implementations </h3><h3 class='impl'><code>impl&lt;T: <a class='trait' href='http://doc.rust-lang.org/core/clone/trait.Clone.html' title='core::clone::Clone'>Clone</a>&gt; <a class='trait' href='http://doc.rust-lang.org/core/clone/trait.Clone.html' title='core::clone::Clone'>Clone</a> for <a class='struct' href='../matrixrs/struct.Matrix.html' title='matrixrs::Matrix'>Matrix</a>&lt;T&gt;</code></h3><div class='methods'><h4 id='method.clone' class='method'><code>fn <a href='#method.clone' class='fnname'>clone</a>(&amp;self) -&gt; <a class='struct' href='../matrixrs/struct.Matrix.html' title='matrixrs::Matrix'>Matrix</a>&lt;T&gt;</code></h4>
+<h4 id='method.clone_from' class='method'><code>fn <a href='#tymethod.clone_from' class='fnname'>clone_from</a>(&amp;mut self, source: &amp;Self)</code></h4>
+</div></section>
     <section id='search' class="content hidden"></section>
 
     <section class="footer"></section>
