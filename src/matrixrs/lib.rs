@@ -17,12 +17,14 @@ use std::iter::FromIterator;
 use std::slice::Items;
 
 /// The Matrix struct represent a matrix
+
+#[deriving(Clone)]
 pub struct Matrix<T> {
 	/// Number of rows
-	row: uint,
+	pub row: uint,
 
 	/// Number of columns
-	col: uint,
+	pub col: uint,
 
 	/// Table (Vector of Vector) of data values in the matrix
 	/// its a vec of rows which are vecs of elems
@@ -51,6 +53,11 @@ impl<T> Matrix<T> {
 		//! Return the size of a Matrix as (row, column).
 		(self.row, self.col)
 	}
+
+	pub fn set(&mut self, row: uint, col: uint, val: T) {
+		//!
+		self.data.as_mut_slice()[row-1].as_mut_slice()[col-1] = val;
+	}
 }
 
 impl<T:Clone> Matrix<T> {
@@ -72,7 +79,8 @@ impl<T:Clone> Matrix<T> {
 	}
 
 	pub fn from_vec(row: uint, col: uint, vals: Vec<T>) -> Matrix<T> {
-		//!
+		//! deprecated use to_matrix in stead.
+
 		assert_eq!(row * col, vals.len());
 		let mut v_iter = vals.iter();
 			Matrix {
@@ -83,24 +91,6 @@ impl<T:Clone> Matrix<T> {
        			).collect()
        	}
 		
-	}
-
-	pub fn from_vecvec(vals: Vec<Vec<T>>) -> Matrix<T> {
-		//!
-		let row = vals.len();
-		if row == 0 {
-			return Matrix {
-				row: 0,
-				col: 0,
-				data: vec!(vec!())
-			}
-		}
-		let col = vals.get(0).len();
-		Matrix {
-			row: row,
-			col: col,
-			data: vals
-		}
 	}
 
 	pub fn at(&self, row: uint, col: uint) -> T {
@@ -450,6 +440,7 @@ impl<T:Clone> Index<(uint, uint), T> for Matrix<T> {
 impl<T:Clone> Not<Matrix<T>> for Matrix<T> {
 	fn not(&self) -> Matrix<T> {
 		//! Return the transpose of self.
+		//! if you don't want to use this, use .transpose() in stead.
 
 		self.transpose()
 	}
@@ -508,16 +499,23 @@ pub fn eye<T:Zero+One>(dim : uint) -> Matrix<T> {
 //-----------------------------------------------------------------
 
 /// A trait that convert T to Matrix<T>
-pub trait ToMatrix {
+pub trait ToMatrix<T> {
 	/// The convertion function
-	fn to_matrix(&self, row: uint, col: uint) -> Matrix<Self>;
+	fn to_matrix(&mut self, row: uint, col: uint) -> Matrix<T>;
 }
 
-impl<T:Clone> ToMatrix for T {
-	fn to_matrix(&self, row: uint, col: uint) -> Matrix<T> {
-		Matrix::from_elem(row, col, self.clone())
+impl<T:Clone,U:Iterator<T>> ToMatrix<T> for U {
+	fn to_matrix(&mut self, row: uint, col: uint) -> Matrix<T> {
+		let v: Vec<T> = self.by_ref().map(|a| a.clone()).collect();
+		Matrix::from_vec(row, col, v)
 	}
 }
+
+// impl<T:Clone> ToMatrix<T> for T {
+// 	fn to_matrix(&self, row: uint, col: uint) -> Matrix<T> {
+// 		Matrix::from_elem(row, col, self.clone())
+// 	}
+// }
 
 //--------------------------------------------------------------------
 
@@ -555,7 +553,17 @@ impl<T:Clone> FromIterator<T> for Matrix<T> {
     	//! | 1 2 |
     	//! | 3 4 |
     	//! ```
-
+    	//! 
+    	//! ```rust
+    	//!	let v = vec![1,2,3,4,5,6];
+    	//! let m: Matrix<int> = v.iter().map(|x| x.clone()).to_matrix(2,3);
+    	//! println!("{}",m);
+    	//!
+    	//! Output:
+    	//! | 1 2 |
+    	//! | 3 4 |
+    	//! | 5 6 |
+    	//! ```
     	let cp: Vec<T> = iterator.collect();
 
        	let num_round = (cp.iter().count() as f64).sqrt().floor().powi(2) as uint;
@@ -585,6 +593,7 @@ impl<'a,T:Clone> MatrixIter<'a,T> {
 	// 	m.iter().rows()
 	// }
 }
+
 impl<'a,T:Clone> Iterator<T> for MatrixIter<'a,T> {
 	fn next(&mut self) -> Option<T> {
 		match (self.curr_row, self.curr_col) {
