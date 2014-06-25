@@ -2,9 +2,12 @@
 
 ### Quick Setup
 
-due to abandon of rustpkg, use bare rustc before cargo is mature enough
+now matrixrs is cargo-ified!
 
 ```
+git clone github.com/doomsplayer/matrixrs
+
 cd matrixrs
-rustc ./lib.rs
+
+cargo build
 ```

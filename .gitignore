@@ -9,3 +9,4 @@ test.rs
 *.rlib
 *.so
 *.a
+/target

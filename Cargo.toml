@@ -1,0 +1,9 @@
+[package]
+
+name = "matrixrs"
+version = "0.3.0"
+authors = [ "doomsplayer@gmail.com" ]
+
+[[lib]]
+name = "matrixrs"
+path = "src/matrixrs/lib.rs"
