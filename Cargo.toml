@@ -7,3 +7,7 @@ authors = [ "doomsplayer@gmail.com" ]
 [[lib]]
 name = "matrixrs"
 path = "src/matrixrs/lib.rs"
+
+[[bin]]
+name = "example"
+path = "src/example/example.rs"
