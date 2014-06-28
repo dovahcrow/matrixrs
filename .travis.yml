@@ -1,5 +1,3 @@
-language: rust
-
 before_install:
   - wget -q http://static.rust-lang.org/dist/rust-nightly-x86_64-unknown-linux-gnu.tar.gz
   - tar xf rust-nightly-x86_64-unknown-linux-gnu.tar.gz
