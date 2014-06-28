@@ -1,4 +1,4 @@
-## MatrixRS
+## MatrixRS  [![Build Status](https://travis-ci.org/doomsplayer/matrixrs.png?branch=master)](https://travis-ci.org/doomsplayer/matrixrs) #
 
 ### Quick Setup
 
