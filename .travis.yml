@@ -1,7 +1,9 @@
+language: rust
 before_install:
   - wget -q http://static.rust-lang.org/dist/rust-nightly-x86_64-unknown-linux-gnu.tar.gz
   - tar xf rust-nightly-x86_64-unknown-linux-gnu.tar.gz
   - sudo ./rust-nightly-x86_64-unknown-linux-gnu/install.sh
 install:
   - git clone https://github.com/doomsplayer/matrixrs.git
+script:
   - rustc matrixrs/src/matrixrs/lib.rs
