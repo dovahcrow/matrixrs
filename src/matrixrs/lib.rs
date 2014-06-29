@@ -581,10 +581,10 @@ impl<T:Clone> FromIterator<T> for Matrix<T> {
     }
 }
 
-impl<'a,T:Clone> MatrixIter<'a,T> {
-	pub fn rows(self) -> Items<'a,Vec<T>> {
+impl<'a,T:Clone> Matrix<T> {
+	pub fn rows(&'a mut self) -> Items<'a,Vec<T>> {
 		//!
-		self.matrix.data.iter()
+		self.data.iter()
 	}
 
 	// pub fn cols(self) -> Items<'a,Vec<T>> {
