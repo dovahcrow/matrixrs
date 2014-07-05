@@ -11,3 +11,5 @@ cd matrixrs
 
 cargo build
 ```
+
+you can use `rustdoc` to generate the document.

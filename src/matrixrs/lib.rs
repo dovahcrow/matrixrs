@@ -353,13 +353,13 @@ impl<T:Num+NumCast+Clone+Signed+PartialOrd> Matrix<T> {
 			(p, _, u) => {
 				// return the product of the diagonal
 				let mut prod = 1.0;
-				let mut swaps = 0;
+				let mut swaps = 0i;
 				for i in range(0, self.row) {
-					prod *= u.at(i,i);
-					swaps += if p.at(i,i) == one() { 0 } else { 1 };
+					prod *= u.at(i, i);
+					swaps += if p.at(i, i) == one() { 0 } else { 1 };
 				}
 				// flip the sign of the determinant based on swaps of P
-				if (swaps/2) % 2 == 1 {
+				if (swaps / 2) % 2 == 1 {
 					Ok(-prod)
 				} else {
 					Ok(prod)
