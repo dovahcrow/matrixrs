@@ -1,7 +1,7 @@
 //! Matrix -- Generic 2D Matrix implementation in Rust.
 //! Current Version -- 0.3
 
-#![crate_id = "matrixrs#0.3"]
+#![crate_name = "matrixrs"]
 #![crate_type="lib"]
 #![allow(unused_must_use)]
 #![deny(missing_doc)]
@@ -15,7 +15,7 @@ use std::vec::Vec;
 use std::iter::Iterator;
 use std::iter::FromIterator;
 use std::slice::Items;
-
+use std::default::Default;
 /// The Matrix struct represent a matrix
 
 #[deriving(Clone)]
@@ -31,8 +31,15 @@ pub struct Matrix<T> {
 	data: Vec<Vec<T>>
 }
 
+impl<T:Default> Matrix<T> {
+	pub fn new(row: uint, col: uint) -> Matrix<T> {
+		//! make a new matrix with default value
+		Matrix::from_fn(row, col, |_,_| Default::default())
+	}
+}
+
 impl<T> Matrix<T> {
-	pub fn from_fn(row : uint, col : uint, func : |uint, uint| -> T) -> Matrix<T> {
+	pub fn from_fn(row: uint, col: uint, func: |uint, uint| -> T) -> Matrix<T> {
 		//! Create an m-by-n matrix by using a function func
 		//! that returns a number given row and column.
 		//!
@@ -55,8 +62,8 @@ impl<T> Matrix<T> {
 	}
 
 	pub fn set(&mut self, row: uint, col: uint, val: T) {
-		//!
-		self.data.as_mut_slice()[row-1].as_mut_slice()[col-1] = val;
+		//! set value for the specific element of matrix
+		self.data.as_mut_slice()[row - 1].as_mut_slice()[col - 1] = val;
 	}
 }
 
@@ -536,6 +543,23 @@ impl<T:Clone> Matrix<T> {
 		}
 	}
 }
+/// The object that has the implemention of Iterator trait
+pub struct MatrixMutIter<'a,T> {
+	matrix: &'a mut Matrix<T>,
+	curr_row: uint,
+	curr_col: uint
+}
+
+impl<T:Clone> Matrix<T> {
+	pub fn mut_iter<'a>(&'a mut self) -> MatrixMutIter<'a,T> {
+		//! Return a iterator of the matrix
+		MatrixMutIter {
+			matrix: self,
+			curr_row: 0,
+			curr_col: 0
+		}
+	}
+}
 
 /// convert from an iterator
 impl<T:Clone> FromIterator<T> for Matrix<T> {
@@ -595,6 +619,24 @@ impl<'a,T:Clone> Matrix<T> {
 }
 
 impl<'a,T:Clone> Iterator<T> for MatrixIter<'a,T> {
+	fn next(&mut self) -> Option<T> {
+		match (self.curr_row, self.curr_col) {
+			(row, col) if row < self.matrix.row && col < self.matrix.col => {
+				if self.matrix.col == col + 1 {
+					self.curr_row += 1;
+					self.curr_col = 0;	
+				} else {
+					self.curr_col +=1;
+				}
+				Some(self.matrix.at(row, col))
+			}
+			_ => None
+		}
+		
+	}
+}
+
+impl<'a,T:Clone> Iterator<T> for MatrixMutIter<'a,T> {
 	fn next(&mut self) -> Option<T> {
 		match (self.curr_row, self.curr_col) {
 			(row, col) if row < self.matrix.row && col < self.matrix.col => {
