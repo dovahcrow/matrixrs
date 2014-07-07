@@ -116,7 +116,7 @@ impl<T:Clone> Matrix<T> {
 		v
 	}
 
-	pub fn row(&self, row: uint) -> Matrix<T> {
+	pub fn row_mat(&self, row: uint) -> Matrix<T> {
 		//! Return specified row from an MxN matrix as a 1xN matrix.
 		//!
 		//! ```rust
@@ -141,7 +141,7 @@ impl<T:Clone> Matrix<T> {
 		range(0, self.row).map(|i| self.at(i, col)).collect::<Vec<T>>()
 	}
 
-	pub fn col(&self, col: uint) -> Matrix<T> {
+	pub fn col_mat(&self, col: uint) -> Matrix<T> {
 		//! Return specified col from an MxN matrix as an Mx1 matrix.
 		//!
 		//! ```rust
@@ -419,7 +419,7 @@ impl<T:Add<T,T>+Mul<T,T>+Zero+Clone> Mul<Matrix<T>, Matrix<T>> for Matrix<T> {
 
 		assert_eq!(self.col, rhs.row);
 		Matrix::from_fn(self.row, rhs.col, |i,j| {
-			self.row(i).dot(&rhs.col(j))
+			self.row_mat(i).dot(&rhs.col_mat(j))
 		})
 	}
 }
