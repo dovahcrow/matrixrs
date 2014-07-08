@@ -21,10 +21,10 @@ use std::default::Default;
 #[deriving(Clone)]
 pub struct Matrix<T> {
 	/// Number of rows
-	pub row: uint,
+	pub nrow: uint,
 
 	/// Number of columns
-	pub col: uint,
+	pub ncol: uint,
 
 	/// Table (Vector of Vector) of data values in the matrix
 	/// its a vec of rows which are vecs of elems
@@ -32,14 +32,14 @@ pub struct Matrix<T> {
 }
 
 impl<T:Default> Matrix<T> {
-	pub fn new(row: uint, col: uint) -> Matrix<T> {
+	pub fn new(nrow: uint, ncol: uint) -> Matrix<T> {
 		//! make a new matrix with default value
-		Matrix::from_fn(row, col, |_,_| Default::default())
+		Matrix::from_fn(nrow, ncol, |_,_| Default::default())
 	}
 }
 
 impl<T> Matrix<T> {
-	pub fn from_fn(row: uint, col: uint, func: |uint, uint| -> T) -> Matrix<T> {
+	pub fn from_fn(nrow: uint, ncol: uint, func: |uint, uint| -> T) -> Matrix<T> {
 		//! Create an m-by-n matrix by using a function func
 		//! that returns a number given row and column.
 		//!
@@ -50,15 +50,15 @@ impl<T> Matrix<T> {
 		//! );
 		//! ```
 		Matrix {
-			row: row,
-			col: col,
-			data: range(0, row).map(|i| Vec::from_fn(col, |j| func(i, j))).collect()
+			nrow: nrow,
+			ncol: ncol,
+			data: range(0, nrow).map(|i| Vec::from_fn(ncol, |j| func(i, j))).collect()
 		}
 	}
 
 	pub fn size(&self) -> (uint, uint) {
 		//! Return the size of a Matrix as (row, column).
-		(self.row, self.col)
+		(self.nrow, self.ncol)
 	}
 
 	pub fn set(&mut self, row: uint, col: uint, val: T) {
@@ -68,7 +68,7 @@ impl<T> Matrix<T> {
 }
 
 impl<T:Clone> Matrix<T> {
-	pub fn from_elem(row: uint, col: uint, val: T) -> Matrix<T> {
+	pub fn from_elem(nrow: uint, ncol: uint, val: T) -> Matrix<T> {
 		//! Create an m-by-n matrix, where each element is a clone of val.
 		//!
 		//! ```rust
@@ -79,22 +79,22 @@ impl<T:Clone> Matrix<T> {
 		//! ```
 
 		Matrix {
-			row: row,
-			col: col,
-			data: range(0, row).map(|_| Vec::from_elem(col, val.clone())).collect()
+			nrow: nrow,
+			ncol: ncol,
+			data: range(0, nrow).map(|_| Vec::from_elem(ncol, val.clone())).collect()
 		}
 	}
 
-	pub fn from_vec(row: uint, col: uint, vals: Vec<T>) -> Matrix<T> {
+	pub fn from_vec(nrow: uint, ncol: uint, vals: Vec<T>) -> Matrix<T> {
 		//! deprecated use to_matrix in stead.
 
-		assert_eq!(row * col, vals.len());
+		assert_eq!(nrow * ncol, vals.len());
 		let mut v_iter = vals.iter();
 			Matrix {
-       		col: col,
-       		row: row,
-       		data: range(0,row).map(
-       			|_| v_iter.by_ref().take(col).map(|x| x.clone()).collect()
+       		ncol: ncol,
+       		nrow: nrow,
+       		data: range(0,nrow).map(
+       			|_| v_iter.by_ref().take(ncol).map(|x| x.clone()).collect()
        			).collect()
        	}
 		
@@ -128,8 +128,8 @@ impl<T:Clone> Matrix<T> {
 		//! ```
 
 		Matrix {
-			row: 1,
-			col: self.col,
+			nrow: 1,
+			ncol: self.ncol,
 			data: vec![self.row_vec(row)]
 		}
 	}
@@ -138,7 +138,7 @@ impl<T:Clone> Matrix<T> {
 	pub fn col_vec(&self, col: uint) -> Vec<T> {
 		//! return a vec of a column
 
-		range(0, self.row).map(|i| self.at(i, col)).collect::<Vec<T>>()
+		range(0, self.nrow).map(|i| self.at(i, col)).collect::<Vec<T>>()
 	}
 
 	pub fn col_mat(&self, col: uint) -> Matrix<T> {
@@ -155,8 +155,8 @@ impl<T:Clone> Matrix<T> {
 			cols.push(vec![v.clone()]);
 		}
 		Matrix {
-			row: self.row,
-			col: 1,
+			nrow: self.nrow,
+			ncol: 1,
 			data: cols
 		}
 	}
@@ -166,11 +166,11 @@ impl<T:Clone> Matrix<T> {
 		//! Return a new matrix, self augmented by matrix mat.
 		//! An MxN matrix augmented with an MxC matrix produces an Mx(N+C) matrix.
 
-		Matrix::from_fn(self.row, self.col + mat.col, |i,j| {
-			if j < self.col {
+		Matrix::from_fn(self.nrow, self.ncol + mat.ncol, |i,j| {
+			if j < self.ncol {
 				self.at(i, j) 
 			} else {
-				mat.at(i, j - self.col) 
+				mat.at(i, j - self.ncol) 
 			}
 		})
 	}
@@ -179,15 +179,15 @@ impl<T:Clone> Matrix<T> {
 		//! Return the transpose of the matrix.
 		//! The transpose of a matrix MxN has dimensions NxM.
 
-		Matrix::from_fn(self.col, self.row, |i,j| { self.at(j, i) })
+		Matrix::from_fn(self.ncol, self.nrow, |i,j| { self.at(j, i) })
 	}
 
 	pub fn apply(&self, applier: |uint, uint|) {
 		//! Call an applier function with each index in self.
 		//! Input to applier is two parameters: row, col.
 
-		for i in range(0, self.row) {
-			for j in range(0, self.col) {
+		for i in range(0, self.nrow) {
+			for j in range(0, self.ncol) {
 				applier(i, j);
 			}
 		}
@@ -237,7 +237,7 @@ impl<T:Clone, U> Matrix<T> {
 		//! Return a copy of self where each value has been
 		//! operated upon by mapper.
 
-		Matrix::from_fn(self.row, self.col, |i,j| { mapper(self.at(i,j)) })
+		Matrix::from_fn(self.nrow, self.ncol, |i,j| { mapper(self.at(i,j)) })
 	}
 }
 
@@ -257,7 +257,7 @@ impl<T:Add<T,T>+Mul<T,T>+Zero+Clone> Matrix<T> {
 
 	fn dot(&self, other: &Matrix<T>) -> T {
 		//! Return the product of the first row in self with the first row in other.
-		range(0, self.col).fold(zero(), |acc: T, i| {acc + self.at(0, i) * other.at(i, 0)})
+		range(0, self.ncol).fold(zero(), |acc: T, i| {acc + self.at(0, i) * other.at(i, 0)})
 	}
 }
 
@@ -294,16 +294,16 @@ impl<T:Num+NumCast+Clone+Signed+PartialOrd> Matrix<T> {
 		//! Assume that self is a square matrix.
 		
 		// initialize with a type T identity matrix
-		let mut pivot = Matrix::from_fn(self.row, self.col, |i, j| {
+		let mut pivot = Matrix::from_fn(self.nrow, self.ncol, |i, j| {
 			if i == j { one() } else { zero() }
 		});
 
 		// rearrange pivot matrix so max of each column of self is on
 		// the diagonal of self when multiplied by the pivot
-		for j in range(0,self.col) {
+		for j in range(0, self.ncol) {
 			let mut row_max = j;
-			for i in range(j,self.row) {
-				if abs(self.at(i,j)) > abs(self.at(row_max, j)) {
+			for i in range(j, self.nrow) {
+				if abs(self.at(i, j)) > abs(self.at(row_max, j)) {
 					row_max = i;
 				}
 			}
@@ -319,15 +319,15 @@ impl<T:Num+NumCast+Clone+Signed+PartialOrd> Matrix<T> {
 		//! Perform the LU decomposition of square matrix self, and return
 		//! the tuple (P,L,U) where P*self = L*U, and L and U are triangular.
 
-		if self.col != self.row {
+		if self.ncol != self.nrow {
 			return Err("col num don't match row num".to_str());
 		}
-		assert_eq!(self.row, self.col);
+		assert_eq!(self.nrow, self.ncol);
 		let p = self.doolittle_pivot();
 		let pm = (p*(*self)).to_f64();
-		let mut l = eye(self.row);
-		let mut u: Matrix<f64> = zeros(self.row, self.col);
-		for j in range(0, self.col) {
+		let mut l = eye(self.nrow);
+		let mut u: Matrix<f64> = zeros(self.nrow, self.ncol);
+		for j in range(0, self.ncol) {
 			for i in range(0, j+1) {
 				let mut uppersum = 0.0;
 				for k in range(0,i) {
@@ -335,7 +335,7 @@ impl<T:Num+NumCast+Clone+Signed+PartialOrd> Matrix<T> {
 				}
 				u.data.as_mut_slice()[i].as_mut_slice()[j] = pm.at(i,j) - uppersum;
 			}
-			for i in range(j, self.row) {
+			for i in range(j, self.nrow) {
 				let mut lowersum = 0.0;
 				for k in range(0,j) {
 					lowersum += u.at(k,j)*l.at(i,k);
@@ -350,7 +350,7 @@ impl<T:Num+NumCast+Clone+Signed+PartialOrd> Matrix<T> {
 		//! via LU decomposition.
 		//! If not a square matrix, fail.
 
-		if self.col != self.row {
+		if self.ncol != self.nrow {
 			return Err("col num don't match row num".to_str());
 		}
 		match self.lu().unwrap() {
@@ -361,7 +361,7 @@ impl<T:Num+NumCast+Clone+Signed+PartialOrd> Matrix<T> {
 				// return the product of the diagonal
 				let mut prod = 1.0;
 				let mut swaps = 0i;
-				for i in range(0, self.row) {
+				for i in range(0, self.nrow) {
 					prod *= u.at(i, i);
 					swaps += if p.at(i, i) == one() { 0 } else { 1 };
 				}
@@ -385,7 +385,7 @@ impl<T:Add<T,T>+Clone> Add<Matrix<T>,Matrix<T>> for Matrix<T> {
 		//! If sizes don't match, fail.
 
 		assert_eq!(self.size(), rhs.size());
-		Matrix::from_fn(self.row, self.col, |i, j| {
+		Matrix::from_fn(self.nrow, self.ncol, |i, j| {
 			self.at(i,j) + rhs.at(i,j)
 		})
 	}
@@ -417,8 +417,8 @@ impl<T:Add<T,T>+Mul<T,T>+Zero+Clone> Mul<Matrix<T>, Matrix<T>> for Matrix<T> {
 		//! MxR matrix * RxN matrix = MxN matrix.
 		//! If inner dimensions don't match, fail.
 
-		assert_eq!(self.col, rhs.row);
-		Matrix::from_fn(self.row, rhs.col, |i,j| {
+		assert_eq!(self.ncol, rhs.nrow);
+		Matrix::from_fn(self.nrow, rhs.ncol, |i,j| {
 			self.row_mat(i).dot(&rhs.col_mat(j))
 		})
 	}
@@ -427,7 +427,7 @@ impl<T:Add<T,T>+Mul<T,T>+Zero+Clone> Mul<Matrix<T>, Matrix<T>> for Matrix<T> {
 //these will be comments until RFC #48 landed
 // impl<T:Add<T,T>+Mul<T,T>+Zero+Clone+ToMatrix> Mul<T, Matrix<T>> for Matrix<T> {
 // 	fn mul(&self, rhs: &T) -> Matrix<T> {
-// 		let mrhs = rhs.to_matrix(self.row, self.col);
+// 		let mrhs = rhs.to_matrix(self.nrow, self.ncol);
 // 		self * mrhs
 // 	}
 // }
@@ -468,8 +468,8 @@ impl<T:Add<T,T>+Mul<T,T>+num::Zero+Clone> BitXor<uint, Matrix<T>> for Matrix<T> 
 		//! Return a matrix of self raised to the power of rhs.
 		//! Self must be a square matrix.
 
-		assert_eq!(self.row, self.col);
-		let mut ret = Matrix::from_fn(self.row, self.col, |i,j| {
+		assert_eq!(self.nrow, self.ncol);
+		let mut ret = Matrix::from_fn(self.nrow, self.ncol, |i,j| {
 			self.at(i, j)
 		});
 		for _ in range(1, *rhs) {
@@ -596,8 +596,8 @@ impl<T:Clone> FromIterator<T> for Matrix<T> {
 
        	let mut cp_iter = cp.iter();
        	Matrix {
-       		col: num_row,
-       		row: num_row,
+       		ncol: num_row,
+       		nrow: num_row,
        		data: range(0,num_row).map(
        			|_| cp_iter.by_ref().take(num_row).map(|x| x.clone()).collect()
        			).collect()
@@ -606,7 +606,7 @@ impl<T:Clone> FromIterator<T> for Matrix<T> {
 }
 
 impl<'a,T:Clone> Matrix<T> {
-	pub fn rows(&'a mut self) -> Items<'a,Vec<T>> {
+	pub fn row_iter(&'a mut self) -> Items<'a,Vec<T>> {
 		//!
 		self.data.iter()
 	}
@@ -621,8 +621,8 @@ impl<'a,T:Clone> Matrix<T> {
 impl<'a,T:Clone> Iterator<T> for MatrixIter<'a,T> {
 	fn next(&mut self) -> Option<T> {
 		match (self.curr_row, self.curr_col) {
-			(row, col) if row < self.matrix.row && col < self.matrix.col => {
-				if self.matrix.col == col + 1 {
+			(row, col) if row < self.matrix.nrow && col < self.matrix.ncol => {
+				if self.matrix.ncol == col + 1 {
 					self.curr_row += 1;
 					self.curr_col = 0;	
 				} else {
@@ -639,8 +639,8 @@ impl<'a,T:Clone> Iterator<T> for MatrixIter<'a,T> {
 impl<'a,T:Clone> Iterator<T> for MatrixMutIter<'a,T> {
 	fn next(&mut self) -> Option<T> {
 		match (self.curr_row, self.curr_col) {
-			(row, col) if row < self.matrix.row && col < self.matrix.col => {
-				if self.matrix.col == col + 1 {
+			(row, col) if row < self.matrix.nrow && col < self.matrix.ncol => {
+				if self.matrix.ncol == col + 1 {
 					self.curr_row += 1;
 					self.curr_col = 0;	
 				} else {
