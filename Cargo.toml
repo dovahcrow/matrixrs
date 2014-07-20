@@ -1,13 +1,13 @@
 [package]
 
 name = "matrixrs"
-version = "0.3.1"
+version = "0.3.2"
 authors = [ "doomsplayer@gmail.com" ]
 
 [[lib]]
 name = "matrixrs"
-path = "src/matrixrs/lib.rs"
+path = "src/lib.rs"
 
 [[bin]]
 name = "example"
-path = "src/example/example.rs"
+path = "example/example.rs"

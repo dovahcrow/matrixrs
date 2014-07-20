@@ -104,7 +104,7 @@ impl<T:Clone> Matrix<T> {
 		//! Return the element at row, col.
 		//! Wrapped by Index trait.
 
-		self.data.get(row).get(col).clone()
+		self.data[row][col].clone()
 	}
 
 	
@@ -112,7 +112,7 @@ impl<T:Clone> Matrix<T> {
 		//! return a vec of a row
 
 		let mut v = Vec::new();
-		v.clone_from(self.data.get(row));
+		v.clone_from(&self.data[row]);
 		v
 	}
 
@@ -220,7 +220,7 @@ impl<T:Show> Show for Matrix<T> {
 			write!(fmt, "|");
 			for v in i.iter() {
 				let slen = format!("{}", v).len();
-				let mut padding = " ".to_str();
+				let mut padding = " ".to_string();
 				for _ in range(0, max_width-slen) {
 					padding.push_str(" ");
 				}
@@ -320,7 +320,7 @@ impl<T:Num+NumCast+Clone+Signed+PartialOrd> Matrix<T> {
 		//! the tuple (P,L,U) where P*self = L*U, and L and U are triangular.
 
 		if self.ncol != self.nrow {
-			return Err("col num don't match row num".to_str());
+			return Err("col num don't match row num".to_string());
 		}
 		assert_eq!(self.nrow, self.ncol);
 		let p = self.doolittle_pivot();
@@ -351,7 +351,7 @@ impl<T:Num+NumCast+Clone+Signed+PartialOrd> Matrix<T> {
 		//! If not a square matrix, fail.
 
 		if self.ncol != self.nrow {
-			return Err("col num don't match row num".to_str());
+			return Err("col num don't match row num".to_string());
 		}
 		match self.lu().unwrap() {
 			// |L|=1 because it L is unitriangular
@@ -434,11 +434,11 @@ impl<T:Add<T,T>+Mul<T,T>+Zero+Clone> Mul<Matrix<T>, Matrix<T>> for Matrix<T> {
 
 /// use [(x,y)] to index matrices
 impl<T:Clone> Index<(uint, uint), T> for Matrix<T> {
-	fn index(&self, &rhs: &(uint, uint)) -> T {
+	fn index<'a>(&'a self, &rhs: &(uint, uint)) -> &'a T {
 		//! Return the element at the location specified by a (row, column) tuple.
 
 		match rhs {
-			(x,y) => self.at(x,y)
+			(x,y) => &self.data[x][y]
 		}
 	}
 }
