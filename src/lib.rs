@@ -6,6 +6,7 @@
 #![allow(unused_must_use)]
 #![deny(missing_doc)]
 #![feature(macro_rules)]
+
 extern crate debug;
 use std::num;
 use std::num::{abs,zero,one,Zero,One};
@@ -654,27 +655,29 @@ impl<'a,T:Clone> Iterator<T> for MatrixMutIter<'a,T> {
 	}
 }
 
-//-----------------------------------------------------------------
-// macro_rules! matrix (
-// 	($(|$($elem:expr) +|)+) => (
-// 		let mut v = Vec::new();
-// 		$(
-// 			let mut vsub = Vec::new();
-// 			$(
-// 				vsub.push($elem)
-// 			)+
-// 			v.push(vsub);
-// 		)+
+// -----------------------------------------------------------------
 
-// 		let len = v.iter().next().len();
-// 		for vs in v.iter() {
-// 			assert_eq(len,vs.len());
-// 		}
+#[macro_export]
+macro_rules! matrix (
+	($($($elem:expr)+)|+) => ({
+		let mut v = Vec::new();
+		$(
+			let mut vsub = Vec::new();
+			$(
+				vsub.push($elem);
+			)+
+			v.push(vsub);
+		)+
 
-// 		Matrix {
-// 			row: v.len();
-// 			col: len;
-// 			data: v
-// 		}
-// 	)
-// )
+		let len = v.iter().next().len();
+		for vs in v.iter() {
+			assert_eq!(len,vs.len());
+		}
+
+		Matrix {
+			row: v.len(),
+			col: len,
+			data: v
+		}
+	});
+)
