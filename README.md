@@ -5,11 +5,12 @@
 now matrixrs is cargo-ified!
 
 ```
-git clone github.com/doomsplayer/matrixrs
+add dependency to your Cargo.toml
 
-cd matrixrs
+[dependencies.matrixrs]
+git = "http://github.com/doomsplayer/matrixrs"
 
-cargo build
 ```
+that's all!
 
 you can use `rustdoc` to generate the document.
