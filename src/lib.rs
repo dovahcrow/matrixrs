@@ -29,7 +29,7 @@ pub struct Matrix<T> {
 
 	/// Table (Vector of Vector) of data values in the matrix
 	/// its a vec of rows which are vecs of elems
-	data: Vec<Vec<T>>
+	pub data: Vec<Vec<T>>
 }
 
 impl<T:Default> Matrix<T> {
@@ -659,24 +659,26 @@ impl<'a,T:Clone> Iterator<T> for MatrixMutIter<'a,T> {
 
 #[macro_export]
 macro_rules! matrix (
-	($($($elem:expr)+)|+) => ({
+	($([ $($elem:expr),+ ])+) => ({
+
 		let mut v = Vec::new();
 		$(
 			let mut vsub = Vec::new();
 			$(
 				vsub.push($elem);
 			)+
+			
 			v.push(vsub);
 		)+
+		let len = v[0].len(); 
 
-		let len = v.iter().next().len();
 		for vs in v.iter() {
 			assert_eq!(len,vs.len());
 		}
 
 		Matrix {
-			row: v.len(),
-			col: len,
+			nrow: v.len(),
+			ncol: len,
 			data: v
 		}
 	});
