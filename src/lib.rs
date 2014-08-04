@@ -17,10 +17,12 @@ use std::iter::Iterator;
 use std::iter::FromIterator;
 use std::slice::Items;
 use std::default::Default;
+use dimension::Dimension;
+mod dimension;
 /// The Matrix struct represent a matrix
 
 #[deriving(Clone)]
-pub struct Matrix<T> {
+pub struct Matrix<T,D> {
 	/// Number of rows
 	pub nrow: uint,
 
@@ -32,15 +34,15 @@ pub struct Matrix<T> {
 	pub data: Vec<Vec<T>>
 }
 
-impl<T:Default> Matrix<T> {
-	pub fn new(nrow: uint, ncol: uint) -> Matrix<T> {
+impl<T:Default> Matrix<T,Dimension> {
+	pub fn new(nrow: uint, ncol: uint) -> Matrix<T,Dimension> {
 		//! make a new matrix with default value
 		Matrix::from_fn(nrow, ncol, |_,_| Default::default())
 	}
 }
 
-impl<T> Matrix<T> {
-	pub fn from_fn(nrow: uint, ncol: uint, func: |uint, uint| -> T) -> Matrix<T> {
+impl<T> Matrix<T,Dimension> {
+	pub fn from_fn(nrow: uint, ncol: uint, func: |uint, uint| -> T) -> Matrix<T,Dimension> {
 		//! Create an m-by-n matrix by using a function func
 		//! that returns a number given row and column.
 		//!
