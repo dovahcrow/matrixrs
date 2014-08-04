@@ -33,15 +33,15 @@ pub struct Matrix<T,D> {
 	pub data: Vec<Vec<T>>
 }
 
-impl<T:Default> Matrix<T,Dimension> {
-	pub fn new(nrow: uint, ncol: uint) -> Matrix<T,Dimension> {
+impl<T:Default> Matrix<T> {
+	pub fn new(nrow: uint, ncol: uint) -> Matrix<T> {
 		//! make a new matrix with default value
 		Matrix::from_fn(nrow, ncol, |_,_| Default::default())
 	}
 }
 
-impl<T> Matrix<T,Dimension> {
-	pub fn from_fn(nrow: uint, ncol: uint, func: |uint, uint| -> T) -> Matrix<T,Dimension> {
+impl<T> Matrix<T> {
+	pub fn from_fn(nrow: uint, ncol: uint, func: |uint, uint| -> T) -> Matrix<T> {
 		//! Create an m-by-n matrix by using a function func
 		//! that returns a number given row and column.
 		//!
