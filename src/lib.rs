@@ -17,8 +17,7 @@ use std::iter::Iterator;
 use std::iter::FromIterator;
 use std::slice::Items;
 use std::default::Default;
-use dimension::Dimension;
-mod dimension;
+
 /// The Matrix struct represent a matrix
 
 #[deriving(Clone)]
