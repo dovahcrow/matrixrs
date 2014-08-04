@@ -21,7 +21,7 @@ use std::default::Default;
 /// The Matrix struct represent a matrix
 
 #[deriving(Clone)]
-pub struct Matrix<T,D> {
+pub struct Matrix<T> {
 	/// Number of rows
 	pub nrow: uint,
 
