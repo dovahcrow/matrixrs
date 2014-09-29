@@ -4,7 +4,7 @@ name = "matrixrs"
 version = "0.3.2"
 authors = [ "doomsplayer@gmail.com" ]
 
-[[lib]]
+[lib]
 name = "matrixrs"
 path = "src/lib.rs"
 
