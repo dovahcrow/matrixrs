@@ -529,7 +529,7 @@ impl<T:Clone,U:Iterator<T>> ToMatrix<T> for U {
 //--------------------------------------------------------------------
 
 /// The object that has the implemention of Iterator trait
-pub struct MatrixIter<'a,T> {
+pub struct MatrixIter<'a,T:'a> {
 	matrix: &'a Matrix<T>,
 	curr_row: uint,
 	curr_col: uint
@@ -546,7 +546,7 @@ impl<T:Clone> Matrix<T> {
 	}
 }
 /// The object that has the implemention of Iterator trait
-pub struct MatrixMutIter<'a,T> {
+pub struct MatrixMutIter<'a,T:'a> {
 	matrix: &'a mut Matrix<T>,
 	curr_row: uint,
 	curr_col: uint
